@@ -1,0 +1,11 @@
+include cmsed
+!!! 5
+html
+    head
+    body
+        = currentRoute.classModuleName ~ "." ~ currentRoute.className ~ "." ~ currentRoute.functionName ~ " = " ~ currentRoute.type ~ ":" ~ currentRoute.path
+        - widgitByPosition("test");
+        - import cmsed.base.registration.widgitroute;
+        - foreach(wr; getWidgitRoutes())
+            = wr.file ~ " " ~ wr.name ~ " " ~ wr.position ~ " " ~ wr.widgitInfo ~ wr.routeInfo.classModuleName ~ "." ~ wr.routeInfo.className ~ "." ~ wr.routeInfo.functionName ~ " = " ~ wr.routeInfo.type ~ ":" ~ wr.routeInfo.path
+            br
