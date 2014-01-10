@@ -1,0 +1,14 @@
+- void widgetByPosition(string file = __FILE__)(string position)
+    - static if (isFirstExecute)
+        - import cmsed.base.registration.widgetroute;
+        - registerWidgetRoute(file, currentRoute, null, position, null);
+    - else
+        - import bw = cmsed.base.registration.widget;
+        = bw.runWidget(position)
+- void widget(string file = __FILE__)(string name, string position, string value=null)
+    - static if (isFirstExecute)
+        - import cmsed.base.registration.widgetroute;
+        - registerWidgetRoute(file, currentRoute, name, position, null);
+    - else
+        - import bw = cmsed.base.registration.widget;
+        = bw.runWidget(name, position, value)

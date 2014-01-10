@@ -3,4 +3,4 @@ public import cmsed.base.registration.model;
 public import cmsed.base.registration.routes;
 public import cmsed.base.registration.update;
 public import cmsed.base.registration.onload;
-public import cmsed.base.registration.widgit;
+public import cmsed.base.registration.widget;

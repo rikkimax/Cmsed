@@ -1,5 +1,5 @@
 module cmsed.base.registration.routes;
-import cmsed.base.registration.widgitroute;
+import cmsed.base.registration.widgetroute;
 import cmsed.base.config;
 import cmsed.base.routing;
 import std.file : write;
@@ -41,6 +41,6 @@ void configureRoutes(bool isInstall) {
 			func();
 		}
 		
-		outputWidgits();
+		outputWidgets();
 	}
 }

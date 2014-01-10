@@ -1,35 +1,35 @@
-module cmsed.base.registration.widgitroute;
+module cmsed.base.registration.widgetroute;
 import cmsed.base.routing : RouteInformation;
 import cmsed.base.config : configuration;
 import std.file : write, append;
 import std.path : buildPath;
 
 /**
- * Registers positions ext. of widgits in routes.
+ * Registers positions ext. of widgets in routes.
  */
 
 private shared {
-	WidgitRoute[] widgitRoutes;
+	WidgetRoute[] widgetRoutes;
 }
 
-class WidgitRoute {
+class WidgetRoute {
 	string file;
 	RouteInformation routeInfo;
 	string name;
 	string position;
-	string widgitInfo;
+	string widgetInfo;
 }
 
-WidgitRoute[] getWidgitRoutes() {
+WidgetRoute[] getWidgetRoutes() {
 	synchronized {
-		return cast(WidgitRoute[])widgitRoutes;
+		return cast(WidgetRoute[])widgetRoutes;
 	}
 }
 
-void registerWidgitRoute(string file, RouteInformation routeInfo, string name, string position, string widgitInfo) {
+void registerWidgetRoute(string file, RouteInformation routeInfo, string name, string position, string widgetInfo) {
 	synchronized {
 		bool isIn = false;
-		foreach(wr; widgitRoutes) {
+		foreach(wr; widgetRoutes) {
 			if (wr.file == file && wr.routeInfo.path == routeInfo.path && wr.routeInfo.type == routeInfo.type && wr.position == position) {
 				isIn = true;
 				break;
@@ -37,25 +37,25 @@ void registerWidgitRoute(string file, RouteInformation routeInfo, string name, s
 		}
 		
 		if (!isIn) {
-			WidgitRoute wr = new WidgitRoute;
+			WidgetRoute wr = new WidgetRoute;
 			wr.routeInfo = routeInfo;
 			wr.file = file;
 			wr.name = name;
 			wr.position = position;
-			wr.widgitInfo = widgitInfo;
-			widgitRoutes ~= cast(shared)wr;
+			wr.widgetInfo = widgetInfo;
+			widgetRoutes ~= cast(shared)wr;
 		}
 	}
 }
 
 protected {
-	void outputWidgits() {
-		shared WidgitRoute[][string] files;
-		foreach(wr; widgitRoutes) {
+	void outputWidgets() {
+		shared WidgetRoute[][string] files;
+		foreach(wr; widgetRoutes) {
 			files[wr.file] ~= wr;
 		}
 		
-		string ofile = buildPath(configuration.logging.dir, configuration.logging.widgitsFile);
+		string ofile = buildPath(configuration.logging.dir, configuration.logging.widgetsFile);
 		write(ofile, "");
 		
 		foreach(k, v; files) {
@@ -64,7 +64,7 @@ protected {
 				append(ofile, """
 -- " ~ wr.position ~ " --
 Name:     " ~ wr.name ~ "
-Value:    " ~ wr.widgitInfo ~ "
+Value:    " ~ wr.widgetInfo ~ "
 Route:    " ~ wr.routeInfo.type ~ ":" ~ wr.routeInfo.path ~ "
 Function: " ~ wr.routeInfo.functionName ~ "
 Class  Name:   " ~ wr.routeInfo.className ~ "

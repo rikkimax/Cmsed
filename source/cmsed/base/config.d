@@ -80,7 +80,7 @@ class Logging {
 		string ormFile = "orm.log";
 		string accessFile = "access.log";
 		string errorFile = "error.log";
-		string widgitsFile = "widgits.log";
+		string widgetsFile = "widgets.log";
 	}
 }
 
