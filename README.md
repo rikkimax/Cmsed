@@ -11,8 +11,8 @@ Features:
 - Install / normal running modes.
 - Node vs all node install configuration differentiation (node in file includes e.g. database vs in database as a cache)
 - Session storage resides in database.
-- Widgit registration and usage support. Contains list of all widgits with routes accessible at runtime.
-- Logging of all routes, widgits, data models, access.
+- Widget registration and usage support. Contains list of all widgets with routes accessible at runtime.
+- Logging of all routes, widgets, data models, access.
 - Automatic running in reload mode. In which it keeps itself up even if it were to fail (unless arg is passed).
 
 Examples:
@@ -63,4 +63,4 @@ shared static this() {
 ```
 
 Note shared is _required_ part of this. Without it you'll get 8+ registrations of said model (one for each thread).
-Same goes for routing. But here its more important as it is executed and grabbed for values e.g. widgits (route and position/name being requested).
+Same goes for routing. But here its more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
