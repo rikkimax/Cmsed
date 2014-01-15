@@ -33,7 +33,7 @@ shared static this() {
 }
 ```
 
-You can utilise RouteGroup's to append e.g. path values on.
+You can utilise RouteGroups to append e.g. path values on.
 
 ```D
 class Home : OORoute {
@@ -43,7 +43,7 @@ class Home : OORoute {
   }
 }
 ```
-Note UDA's (or attributes) are stackabe. This means you can have quite a lot of those RouteGroups!
+Note UDAs (or attributes) are stackable. This means you can have quite a lot of those RouteGroups!
 
 There are more check out [routing.d](https://github.com/rikkimax/Cmsed/blob/master/source/cmsed/base/routing.d).
 
@@ -62,5 +62,5 @@ shared static this() {
 }
 ```
 
-Note shared is _required_ part of this. Without it you'll get 8+ registrations of said model (one for each thread).
-Same goes for routing. But here its more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
+Note shared is a required part of this.Without it you'll get 8+ registrations of said model (one for each thread).
+Same goes for routing. But here it's more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
