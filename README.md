@@ -62,5 +62,5 @@ shared static this() {
 }
 ```
 
-Note shared is a required part of this.Without it you'll get 8+ registrations of said model (one for each thread).
+Note shared is a _required_ part of this. Without it you'll get 8+ registrations of said model (one for each thread).
 Same goes for routing. But here it's more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
