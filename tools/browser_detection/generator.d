@@ -168,10 +168,21 @@ private {
         }
         return ret;
     }
+    
+    shared BrowserInfo[] browsers;
+}
+
+shared(BrowserInfo) getBrowser(string UA) {
+    import std.regex;
+    foreach(b; browsers) {
+        if (!matchAll(UA, regex(b.userAgent)).empty) {
+            return b;
+        }
+    }
+    return null;
 }
 """;
-    
-    values ~= "private shared BrowserInfo[] browsers;\n\n";
+
     string rfile;
     foreach(bi; all) {
         string val = bi.getCode(all);
@@ -248,6 +259,8 @@ class BrowserInfo {
                             ret ~= (mixin("parent." ~ m) == BoolType.True ? "true" : "false") ~ ",";
                         else
                             ret ~= (mixin(m) == BoolType.True ? "true" : "false") ~ ",";
+                    } else static if (m == "userAgent") {
+                        ret ~= mixin(m).replace("\\", "\\\\").replace(".", "\\.").replace("*", ".*").replace("?", ".?") ~ ",";
                     } else {
                         ret ~= mixin(m) ~ ",";
                     }
@@ -259,4 +272,30 @@ class BrowserInfo {
         
         return ret;
     }
+}
+
+pure string replace(string text, string oldText, string newText, bool caseSensitive = true, bool first = false) {
+	string ret;
+	string tempData;
+	bool stop;
+	foreach(char c; text) {
+		if (tempData.length > oldText.length && !stop) {
+			ret ~= tempData;
+			tempData = "";
+		}
+		if (((oldText[0 .. tempData.length] != tempData && caseSensitive) || (oldText[0 .. tempData.length].toLower() != tempData.toLower() && !caseSensitive)) && !stop) {
+			ret ~= tempData;
+			tempData = "";
+		}
+		tempData ~= c;
+		if (((tempData == oldText && caseSensitive) || (tempData.toLower() == oldText.toLower() && !caseSensitive)) && !stop) {
+			ret ~= newText;
+			tempData = "";
+			stop = first;
+		}
+	}
+	if (tempData != "") {
+		ret ~= tempData;	
+	}
+	return ret;
 }
