@@ -7,7 +7,7 @@ import cmsed.base.registration.routes;
  */
 
 private shared {
-	alias void function(bool isInstall) runOnLoadFunc;
+	alias void delegate(bool isInstall) runOnLoadFunc;
 	
 	runOnLoadFunc[] runOnLoadFuncs;
 }

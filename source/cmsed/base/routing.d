@@ -5,7 +5,7 @@ public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter;
 //import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 //import vibe.http.router : URLRouter;
 
-import vibe.d : render, compileDietFile, MemoryOutputStream;
+import vibe.d : render, compileDietFile, MemoryOutputStream, HTTPMethod;
 //import vibe.http.server : render;
 //import vibe.templ.diet : compileDietFile;
 //import vibe.stream.memory : MemoryOutputStream;
