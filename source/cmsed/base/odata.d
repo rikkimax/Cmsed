@@ -106,7 +106,6 @@ protected {
 				//   application/xml
 				//   application/atom+xml
 				//  default to error 406 Not Acceptable
-				ret ~="import std.file:append;append(\"out.txt\", \"got \" ~ http_request.params[\"key)\"][0 .. $-1] ~ \"\\n\");";
 				ret ~= "        switch(http_request.query.get(\"format\", null)) {\n";
 				ret ~= "            case \"json\":\n";
 				ret ~= "                string jsonValue = \"{\";\n";
