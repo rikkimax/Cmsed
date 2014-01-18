@@ -34,8 +34,7 @@
 		},
 		{
 			"name": "test",
-			"sourcePaths": [],
-            "sourceFiles": ["source/test.d"],
+			"sourcePaths": ["source/cmsed/test"],
 			"targetType": "executable",
 			"targetPath": "bin/test",
             "stringImportPaths": ["views/test"],
