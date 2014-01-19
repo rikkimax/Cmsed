@@ -127,9 +127,9 @@ protected {
 										} else static if (is(typeof(mixin("c." ~ m ~ "." ~ n)) == string) ||
 										                  is(typeof(mixin("c." ~ m ~ "." ~ n)) == dstring) ||
 										                  is(typeof(mixin("c." ~ m ~ "." ~ n)) == wstring)) {
-											ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \\\"\" ~ value." ~ m ~ "." ~ n ~ "~ \"\\\", \";\n";
+											ret ~= "                    jsonValue ~= \"\\\"\" ~ getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \"\\\": \\\"\" ~ value." ~ m ~ "." ~ n ~ "~ \"\\\", \";\n";
 										} else static if (typeof(mixin("c." ~ m ~ "." ~ n)).stringof != "void") {
-											ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \" ~ to!string(value." ~ m ~ "." ~ n ~ ") ~ \", \";\n";
+											ret ~= "                    jsonValue ~= \"\\\"\" ~ getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \"\\\": \" ~ to!string(value." ~ m ~ "." ~ n ~ ") ~ \", \";\n";
 										}
 									}
 								}
@@ -137,9 +137,9 @@ protected {
 						} else static if (is(typeof(mixin("c." ~ m)) == string) ||
 						                  is(typeof(mixin("c." ~ m)) == dstring) ||
 						                  is(typeof(mixin("c." ~ m)) == wstring)) {
-							ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \\\"\" ~ value." ~ m ~ " ~ \"\\\", \";\n";
+							ret ~= "                    jsonValue ~= \"\\\"\" ~ getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"\\\": \\\"\" ~ value." ~ m ~ " ~ \"\\\", \";\n";
 						} else static if (typeof(mixin("c." ~ m)).stringof != "void") {
-							ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \" ~ to!string(value." ~ m ~ ") ~ \", \";\n";
+							ret ~= "                    jsonValue ~=\"\\\"\" ~  getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"\\\": \" ~ to!string(value." ~ m ~ ") ~ \", \";\n";
 						}
 					}
 				}
