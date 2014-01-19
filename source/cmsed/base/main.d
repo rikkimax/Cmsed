@@ -21,9 +21,9 @@ import core.time : dur;
 version(ExcludeCmsedMain) {
 } else {
 	int main(string[] args) {
-		bool runAnIteration = false;
+		bool runForever = false;
 		bool isInstallMode = false;
-		getOption("runIteration|ri", &runAnIteration, "Runs an iteration of the web service");
+		getOption("forever", &runForever, "Runs the web service continuesly even upon error");
 		getOption("install|i", &isInstallMode, "Starts an iteration of the web service in install mode");
 		
 		try {
@@ -39,7 +39,7 @@ version(ExcludeCmsedMain) {
 		}
 		
 		lowerPrivileges();
-		if (runAnIteration) {
+		if (!runForever) {
 			return runIteration(isInstallMode) ? 2 : 1;
 		} else {
 			while(true) {
