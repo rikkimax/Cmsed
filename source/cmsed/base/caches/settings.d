@@ -9,7 +9,7 @@ import cmsed.base.cache;
 
 mixin CacheManager!(SystemSettingModel, "getSystemSettings", true);
 
-shared(SystemSettingModel) getSettingByName(string name) {
+SystemSettingModel getSettingByName(string name) {
 	synchronized {
 		foreach(s; getSystemSettings) {
 			if (s.name == name)
