@@ -1,4 +1,5 @@
 module cmsed.test.models.book;
+import cmsed.base.routing;
 import dvorm;
 
 @dbName("Books3")
