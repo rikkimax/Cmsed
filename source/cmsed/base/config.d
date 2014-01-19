@@ -1,10 +1,8 @@
 module cmsed.base.config;
 import cmsed.base.routing;
-import cmsed.base.sessionstorage;
 import dvorm.connection;
 import vibe.data.json;
 import vibe.stream.ssl;
-import vibe.http.server : HTTPServerSettings;
 import std.file : read, exists, isFile, mkdirRecurse, timeLastModified;
 import std.path : buildPath;
 import core.time : Duration;
@@ -122,17 +120,4 @@ bool hasConfigurationChanged() {
 	synchronized {
 		return timeLastModified(lastUsedConfigFile) - lastModifiedTime > Duration.zero();
 	}
-}
-
-HTTPServerSettings getWebServerSettings() {
-	HTTPServerSettings settings = new HTTPServerSettings();
-	settings.port = configuration.bind.port;
-	settings.bindAddresses = cast(string[])configuration.bind.ip;
-	settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
-	settings.sessionStore = new DbSessionStore;
-	
-	if (configuration.bind.ssl.cert != "" && configuration.bind.ssl.key != "")
-		settings.sslContext = new SSLContext(configuration.bind.ssl.cert, configuration.bind.ssl.key);
-	
-	return settings;
 }

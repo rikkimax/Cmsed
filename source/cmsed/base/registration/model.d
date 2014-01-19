@@ -17,6 +17,8 @@ private shared {
 	configureModelDatabasesOnInitFunc[] configureModelDatabasesOnInit;
 	
 	void configureModelDatabase(C)() {
+		C.logMe();
+		
 		string clasz = C.stringof;
 		shared Database db = configuration.modelDatabases.get(clasz, null);
 		if (db is Database.init)

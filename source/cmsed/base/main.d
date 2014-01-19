@@ -2,6 +2,7 @@ module cmsed.base.main;
 import cmsed.base.routing;
 import cmsed.base.config;
 import cmsed.base.registration;
+import cmsed.base.sessionstorage;
 import vibe.d;
 import dvorm;
 import std.path : buildPath;
@@ -81,7 +82,20 @@ bool runIteration(bool isInstall) {
 		// add public directory for static content
 		getURLRouter().get("*", serveStaticFiles("./public/",));
 		
-		listenHTTP(getWebServerSettings(), getURLRouter());
+		// There was dependency problems with having this inside config.
+		// As pretty much everything used config at some stage.
+		// Basically module ctors/dtors had cyclic dependencies. Moving here fixed that.
+		// Blame Session storage.
+		HTTPServerSettings settings = new HTTPServerSettings();
+		settings.port = configuration.bind.port;
+		settings.bindAddresses = cast(string[])configuration.bind.ip;
+		settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
+		settings.sessionStore = new DbSessionStore;
+		
+		if (configuration.bind.ssl.cert != "" && configuration.bind.ssl.key != "")
+			settings.sslContext = new SSLContext(configuration.bind.ssl.cert, configuration.bind.ssl.key);
+		
+		listenHTTP(settings, getURLRouter());
 		runEventLoop();
 	} catch (Exception e){ 
 		// log this
