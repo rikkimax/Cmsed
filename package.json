@@ -38,6 +38,15 @@
 			],
 		},
 		{
+			"name": "user",
+			"sourcePaths": ["source/cmsed/user"],
+			"targetType": "library",
+			"targetPath": "bin/user",
+			"dependencies": {
+				"cmsed:base": "~master",
+			}
+		},
+		{
 			"name": "test",
 			"sourcePaths": ["source/cmsed/test"],
 			"targetType": "executable",
