@@ -10,6 +10,7 @@ public import cmsed.base.routing;
 public import cmsed.base.sessionstorage;
 public import cmsed.base.util;
 public import cmsed.base.cache;
+public import cmsed.base.odata;
 
 /**
  * Timezone information generated from the compiler's system.

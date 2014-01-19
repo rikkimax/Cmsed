@@ -161,8 +161,6 @@ protected {
 				ret ~= "    }\n";
 				ret ~= "}\n";
 				
-				// handle Classname(:key)?$top=m&$skip=n
-				
 				foreach(m; __traits(allMembers, C)) {
 					static if (isUsable!(C, m)() && !shouldBeIgnored!(C, m)()) {
 						static if (!is(typeof(mixin("c." ~ m)) == void)) { // for some reason it has a habit of grabbing a few NON types which are void
