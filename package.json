@@ -27,11 +27,15 @@
 			"dependencies": {
 				"vibe-d": "~master",
 				"dvorm": "~master"
-			},
+			}
+		},
+		{
+			"name": "rebuildTools",
+			"targetType": "sourceLibrary",
 			"preGenerateCommands": [
 				"cd tools/timezone && rdmd generator cmsed.base.timezones",
 				"cd tools/browser_detection && rdmd generator cmsed.base.browser_detection"
-			]
+			],
 		},
 		{
 			"name": "test",
