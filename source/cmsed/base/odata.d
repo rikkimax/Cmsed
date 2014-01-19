@@ -95,6 +95,11 @@ protected {
 				// if so call it
 				//  if true do following:
 				// if not exist do the following:
+				static if (__traits(hasMember, C, "canView") && typeof(&c.canView).stringof == "bool delegate()") {
+					ret ~= "        if (value.canView()) {\n";
+				} else {
+					ret ~= "        if (true) {\n";
+				}
 				
 				// output it
 				// what format should we output to?
@@ -106,11 +111,11 @@ protected {
 				//   application/xml
 				//   application/atom+xml
 				//  default to error 406 Not Acceptable
-				ret ~= "        switch(http_request.query.get(\"format\", null)) {\n";
-				ret ~= "            case \"json\":\n";
-				ret ~= "                string jsonValue = \"{\";\n";
-				ret ~= "                jsonValue ~= \"\\\"d\\\": {\";\n";
-				ret ~= "                jsonValue ~= \"\\\"results\\\": [{\";\n";
+				ret ~= "            switch(http_request.query.get(\"format\", null)) {\n";
+				ret ~= "                case \"json\":\n";
+				ret ~= "                    string jsonValue = \"{\";\n";
+				ret ~= "                    jsonValue ~= \"\\\"d\\\": {\";\n";
+				ret ~= "                    jsonValue ~= \"\\\"results\\\": [{\";\n";
 				foreach (m; __traits(allMembers, C)) {
 					static if (isUsable!(C, m)() && !shouldBeIgnored!(C, m)()) {
 						static if (is(typeof(mixin("c." ~ m)) : Object)) {
@@ -122,9 +127,9 @@ protected {
 										} else static if (is(typeof(mixin("c." ~ m ~ "." ~ n)) == string) ||
 										                  is(typeof(mixin("c." ~ m ~ "." ~ n)) == dstring) ||
 										                  is(typeof(mixin("c." ~ m ~ "." ~ n)) == wstring)) {
-											ret ~= "                jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \\\"\" ~ value." ~ m ~ "." ~ n ~ "~ \"\\\", \";\n";
+											ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \\\"\" ~ value." ~ m ~ "." ~ n ~ "~ \"\\\", \";\n";
 										} else static if (typeof(mixin("c." ~ m ~ "." ~ n)).stringof != "void") {
-											ret ~= "                jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \" ~ to!string(value." ~ m ~ "." ~ n ~ ") ~ \", \";\n";
+											ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \"_\" ~ getNameValue!(typeof(value." ~ m ~ "), \"" ~ n ~ "\") ~ \": \" ~ to!string(value." ~ m ~ "." ~ n ~ ") ~ \", \";\n";
 										}
 									}
 								}
@@ -132,9 +137,9 @@ protected {
 						} else static if (is(typeof(mixin("c." ~ m)) == string) ||
 						                  is(typeof(mixin("c." ~ m)) == dstring) ||
 						                  is(typeof(mixin("c." ~ m)) == wstring)) {
-							ret ~= "                jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \\\"\" ~ value." ~ m ~ " ~ \"\\\", \";\n";
+							ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \\\"\" ~ value." ~ m ~ " ~ \"\\\", \";\n";
 						} else static if (typeof(mixin("c." ~ m)).stringof != "void") {
-							ret ~= "                jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \" ~ to!string(value." ~ m ~ ") ~ \", \";\n";
+							ret ~= "                    jsonValue ~= getNameValue!(typeof(value), \"" ~ m ~ "\") ~ \": \" ~ to!string(value." ~ m ~ ") ~ \", \";\n";
 						}
 					}
 				}
@@ -145,6 +150,7 @@ protected {
 				ret ~= "            default:\n";
 				ret ~= "                http_response.statusCode = cast(HTTPStatus)406;\n";
 				ret ~= "                break;\n";
+				ret ~= "            }\n";
 				ret ~= "        }\n";
 				
 				// check which properties are not allowed.
