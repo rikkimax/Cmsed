@@ -15,7 +15,7 @@ import vibe.http.session;
  * Checks to make sure that in a request that the user has already been authenticated.
  */
 bool isAuthed(string redirectUrl = null)() {
-	if(!hasSessionStart() || getLoggedInUser !is null) {
+	if(!hasSessionStart() || getLoggedInUser() is null) {
 		static if (redirectUrl !is null) {
 			http_response.redirect(redirectUrl);
 		}
