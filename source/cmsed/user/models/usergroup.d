@@ -34,4 +34,16 @@ class UserGroupModel {
 	GroupModel getGroup() {
 		return group.getGroup();
 	}
+	
+	static UserGroupModel[] getByUser(UserModel user) {
+		return UserGroupModel.query()
+			.user_key_eq(user.key.key)
+				.find();
+	}
+	
+	static UserGroupModel[] getByGroup(GroupModel group) {
+		return UserGroupModel.query()
+			.group_key_eq(group.key.key)
+				.find();
+	}
 }

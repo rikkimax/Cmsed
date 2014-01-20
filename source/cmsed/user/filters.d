@@ -1,5 +1,6 @@
 module cmsed.user.filters;
 import cmsed.base.routing;
+import cmsed.base.filters;
 import cmsed.user.operations;
 import vibe.http.session;
 
@@ -22,18 +23,6 @@ bool isAuthed(string redirectUrl = null)() {
 	} else {
 		return true;
 	}
-}
-
-/**
- * Checks to make sure the session has already been started.
- */
-bool hasSessionStart() {
-	if (http_request.session is Session.init ||
-	    http_request.session.id == "") {
-		return false;
-	}
-	
-	return true;
 }
 
 /**

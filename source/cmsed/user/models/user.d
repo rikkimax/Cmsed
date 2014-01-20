@@ -1,4 +1,6 @@
 module cmsed.user.models.user;
+import cmsed.user.models.group;
+import cmsed.user.models.usergroup;
 import cmsed.base.util;
 import dvorm;
 import vbson = vibe.data.bson;
@@ -21,6 +23,14 @@ class UserModel {
 	}
 	
 	mixin OrmModel!UserModel;
+	
+	GroupModel[] getGroups() {
+		GroupModel[] ret;
+		foreach(ug; UserGroupModel.query().user_key_eq(key.key).find()) {
+			ret ~= ug.getGroup();
+		}
+		return ret;
+	}
 }
 
 class UserIdModel {

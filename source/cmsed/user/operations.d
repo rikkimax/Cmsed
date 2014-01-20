@@ -1,5 +1,7 @@
 module cmsed.user.operations;
 import cmsed.user.models.user;
+import cmsed.user.models.userauth;
+import cmsed.user.registration.auth;
 import cmsed.base.routing;
 
 /**
@@ -9,8 +11,8 @@ import cmsed.base.routing;
  * 		Returns a UserModel or null if non existant.
  */
 UserModel getLoggedInUser() {
-	if (http_request.session.isKeySet("userId")) {
-		return UserModel.findOne(http_request.session["userId"]);
+	if (session.isKeySet("userId")) {
+		return UserModel.findOne(session["userId"]);
 	}
 	
 	return null;
@@ -21,12 +23,52 @@ UserModel getLoggedInUser() {
  * A username can be an email.
  */
 bool login(string userName, string password) {
-	// should proberbly have some form of auth provider?
-	return false;
+	UserModel um = getUserFromAuth(userName, password);
+	if (um is null) return false;
+	
+	session["userId"] = um.key.key;
+	return true;
+}
+
+/**
+ * Check if the username exists in any of the providers.
+ */
+bool doesUserExist(string name) {
+	return getCheckUserExistsFromAuth(name);
 }
 
 /**
  * Log the current user out.
  */
 void logout() {
+	session["userId"] = null;
+}
+
+private {
+	shared static this() {
+		UserModel dbAuthProvider(string user, string pass) {
+			UserPassword up = new UserPassword;
+			up = pass;
+			UserAuthModel[] uam = UserAuthModel.query()
+				.username_eq(user)
+					.password_hash_eq(up.hash)
+					.find();
+			
+			if (uam.length == 0) return null;
+			
+			return uam[0].user.getUser();
+		}
+		
+		registerAuthProvider(&dbAuthProvider);
+		
+		bool dbAuthCheckProvider(string user) {
+			size_t uam = UserAuthModel.query()
+				.username_eq(user)
+					.count();
+			
+			return (uam > 0);
+		}
+		
+		registerUserExistsProvider(&dbAuthCheckProvider);
+	}
 }

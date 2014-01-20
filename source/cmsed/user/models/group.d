@@ -22,7 +22,7 @@ class GroupModel {
 	
 	mixin OrmModel!GroupModel;
 	
-	UserModel[] getUsersByGroup() {
+	UserModel[] getUsers() {
 		UserModel[] ret;
 		foreach(ug; UserGroupModel.query().group_key_eq(key.key).find()) {
 			ret ~= ug.getUser();
