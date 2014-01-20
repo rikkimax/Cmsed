@@ -1,7 +1,7 @@
 module cmsed.base.routing;
 import cmsed.base.config : configuration;
 
-public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter;
+public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session;
 //import vibe.http.server : HTTPServerRequest, HTTPServerResponse;
 //import vibe.http.router : URLRouter;
 
@@ -59,6 +59,7 @@ struct RouteInformation {
 RouteInformation currentRoute;
 HTTPServerRequest http_request;
 HTTPServerResponse http_response;
+Session session;
 
 /*
  * Below is an array that stores the entirity of all routes currently that can be served.
@@ -151,9 +152,14 @@ private {
 		ret ~= "void " ~ T.stringof ~ "_" ~ f ~ "(HTTPServerRequest req, HTTPServerResponse res) {";
 		ret ~= "    import " ~ moduleName!T ~ ";";
 		ret ~= "    import cmsed.base.routing : currentRoute, RouteInformation;";
+		ret ~= "    import cmsed.base.filters : hasSessionStart;";
 		ret ~= "    currentRoute = RouteInformation(cast(RouteType)\"" ~ type ~ "\", \"" ~ moduleName!T ~ "\", \"" ~ T.stringof ~ "\", \"" ~ f ~  "\", \"" ~ path ~ "\");";
 		ret ~= "    http_request = req;";
 		ret ~= "    http_response = res;";
+		ret ~= "    if (hasSessionStart())";
+		ret ~= "        session = req.session;";
+		ret ~= "    else";
+		ret ~= "        session = res.startSession();";
 		ret ~= "    " ~ T.stringof ~ " t = new " ~ T.stringof ~ ";";
 		static if (useRenderOptionalFunc!(T, f)()) {
 			ret ~= "    if (t." ~ f ~ "())";
@@ -218,9 +224,14 @@ private {
 		ret ~= "void " ~ T.stringof ~ "_" ~ f ~ "(HTTPServerRequest req, HTTPServerResponse res) {";
 		ret ~= "    import " ~ moduleName!T ~ ";";
 		ret ~= "    import cmsed.base.routing : currentRoute, RouteInformation;";
+		ret ~= "    import cmsed.base.filters : hasSessionStart;";
 		ret ~= "    currentRoute = RouteInformation(cast(RouteType)\"" ~ type ~ "\", \"" ~ moduleName!T ~ "\", \"" ~ T.stringof ~ "\", \"" ~ f ~  "\", \"" ~ path ~ "\");";
 		ret ~= "    http_request = req;";
 		ret ~= "    http_response = res;";
+		ret ~= "    if (hasSessionStart())";
+		ret ~= "        session = req.session;";
+		ret ~= "    else";
+		ret ~= "        session = res.startSession();";
 		ret ~= T.stringof ~ " t = new " ~ T.stringof ~ ";";
 		
 		ret ~= """    bool result = true;
