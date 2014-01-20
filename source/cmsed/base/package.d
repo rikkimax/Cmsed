@@ -11,6 +11,7 @@ public import cmsed.base.sessionstorage;
 public import cmsed.base.util;
 public import cmsed.base.cache;
 public import cmsed.base.odata;
+public import cmsed.base.filters;
 
 /**
  * Timezone information generated from the compiler's system.
