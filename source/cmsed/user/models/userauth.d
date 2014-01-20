@@ -5,7 +5,7 @@ import dvorm;
 import vbson = vibe.data.bson;
 import std.digest.ripemd;
 
-@dbName("User")
+@dbName("UserAuth")
 class UserAuthModel {
 	@dbId {
 		@dbName("")
