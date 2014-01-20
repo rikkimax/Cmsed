@@ -4,6 +4,7 @@ import cmsed.base.util;
 import dvorm;
 import vbson = vibe.data.bson;
 import std.digest.ripemd;
+import std.base64;
 
 @dbName("UserAuth")
 class UserAuthModel {
@@ -34,7 +35,7 @@ class UserPassword {
 	
 	private {
 		string hashText(string text) {
-			return toHexString(ripemd160Of(text));
+			return Base64.encode(ripemd160Of(text));
 		}
 	}
 }
