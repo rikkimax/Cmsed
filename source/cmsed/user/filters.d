@@ -29,5 +29,5 @@ bool isAuthed(string redirectUrl = null)() {
  * Is the current user a part of a given group?
  */
 bool isUserInGroup(string groupName)() {
-	return false;
+	return isUserInGroup(groupName);
 }

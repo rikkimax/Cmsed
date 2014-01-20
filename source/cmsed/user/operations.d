@@ -1,6 +1,7 @@
 module cmsed.user.operations;
 import cmsed.user.models.user;
 import cmsed.user.models.userauth;
+import cmsed.user.models.usergroup;
 import cmsed.user.registration.auth;
 import cmsed.base.routing;
 
@@ -35,6 +36,20 @@ bool login(string userName, string password) {
  */
 bool doesUserExist(string name) {
 	return getCheckUserExistsFromAuth(name);
+}
+
+/**
+ * Check if a user is in a group.
+ */
+bool isUserInGroup(string group) {
+	UserGroupModel[] ugma = UserGroupModel.getByUser(getLoggedInUser());
+	foreach(ugm; ugma) {
+		GroupModel gm = ugm.getGroup();
+		if (gm.key.key == group) return true;
+		else if (gm.title == group) return true;
+	}
+	
+	return false;
 }
 
 /**
