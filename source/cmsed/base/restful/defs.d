@@ -1,5 +1,6 @@
 module cmsed.base.restful.defs;
 import cmsed.base.restful.get;
+import cmsed.base.restful.remove;
 
 /**
  * Provides bit field for or'ing to say what code to generate
@@ -66,7 +67,8 @@ pure string restAllCheck(ushort protection, TYPES...)() {
 		}
 		
 		static if ((protection & RestfulProtection.Delete) != 0) {
-			// ret ~= 
+			pragma(msg, removeRestfulData!C());
+			ret ~= removeRestfulData!C();
 		}
 	}
 	return ret;
