@@ -20,13 +20,13 @@ void handleRestfulData" ~ TYPE.stringof ~ "Get() {
 	static if (__traits(hasMember, TYPE, "canView") && typeof(&type.canView).stringof == "bool delegate()") {
 		ret ~= "if (value.canView()) {";
 	} else {
-		ret ~= "if (true) {";
+		ret ~= "static if (true) {";
 	}
 	ret ~= "
 	    Json output = Json.emptyObject;\n";
 	foreach (m; __traits(allMembers, TYPE)) {
 		static if (isUsable!(TYPE, m)() && !shouldBeIgnored!(TYPE, m)()) {
-			ret ~= "            output[\"" ~ m ~ "\"] = outputRestfulTypeJson!(" ~ TYPE.stringof ~ ", \"" ~ m ~ "\")(value);\n";
+			ret ~= "            output[\"" ~ getNameValue!(TYPE, m) ~ "\"] = outputRestfulTypeJson!(" ~ TYPE.stringof ~ ", \"" ~ m ~ "\")(value);\n";
 		}
 	}
 	ret ~= """
@@ -45,7 +45,14 @@ Json outputRestfulTypeJson(TYPE, string m)(TYPE value) {
 		static if (isUsable!(TYPE, m) && !shouldBeIgnored!(TYPE, m)) {
 			foreach (n; __traits(allMembers, typeof(__traits(getMember, value, m)))) {
 				static if (isUsable!(typeof(__traits(getMember, value, m)), n) && isAnId!(typeof(__traits(getMember, value, m)), n)) {
-					output[n] = mixin("value." ~ m ~ "." ~ n);
+					
+					static if ((is(typeof(mixin("value." ~ m ~ "." ~ n)) == string) ||
+					            is(typeof(mixin("value." ~ m ~ "." ~ n)) == dstring) ||
+					            is(typeof(mixin("value." ~ m ~ "." ~ n)) == wstring)) ||
+					           typeof(mixin("value." ~ m ~ "." ~ n)).stringof != "void") {
+						output[getNameValue!(typeof(mixin("value." ~ m)), n)] = mixin("value." ~ m ~ "." ~ n);
+					}
+					
 				}
 			}
 		}
