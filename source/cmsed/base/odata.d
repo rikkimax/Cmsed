@@ -3,6 +3,38 @@ import dvorm;
 import std.traits : moduleName;
 
 /**
+ * What has been implemented:
+ *  View:
+ *  * ClassName(:key)?format=json
+ *  * ClassName(:key)/prop/$value
+ *  Create:
+ *  Delete:
+ *  Modify:
+ * 
+ * TODO:
+ *  View:
+ *  * ClassName?$top=m&$skip=n&$count
+ *  * ClassName?$top=m&$skip=n&$format=xml
+ *  * ClassName?$top=m&$skip=n&$format=atom
+ *  * ClassName?$top=m&$skip=n&$format=json
+ *  * ClassName(:key)?format=xml
+ *  * ClassName(:key)?format=atom
+ *  * ClassName(:key)/prop?format=json
+ *  * ClassName(:key)/prop?format=xml
+ *  * ClassName(:key)/prop?format=atom
+ *  Create:
+ *  * ClassName?format=xml
+ *  * ClassName?format=atom
+ *  * ClassName?format=json
+ *  Delete:
+ *  * ClassName(:key)
+ *  Modify:
+ *  * ClassName?format=xml
+ *  * ClassName?format=atom
+ *  * ClassName?format=json
+ */
+
+/**
  * Provides bit field for or'ing to say what code to generate
  */
 enum ODataProtection : ushort {
