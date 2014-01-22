@@ -1,6 +1,5 @@
 module cmsed.test.routes.test;
 import cmsed.base.routing;
-import cmsed.base.odata;
 import cmsed.base.restful;
 import cmsed.test.models.book;
 
@@ -8,7 +7,6 @@ class Test : OORoute {
 	/*@RouteFunction(RouteType.Get, "/", "index")
 	 bool test() {return true;}*/
 	@RouteGroup(null, "/test.svc") {
-		//mixin ODataRoute!(ODataProtection.All, Book3, Page3);
 		mixin RestfulRoute!(RestfulProtection.All, Book3, Page3);
 	}
 }

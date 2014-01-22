@@ -10,7 +10,7 @@ public import cmsed.base.routing;
 public import cmsed.base.sessionstorage;
 public import cmsed.base.util;
 public import cmsed.base.cache;
-public import cmsed.base.odata;
+public import cmsed.base.restful;
 public import cmsed.base.filters;
 
 /**
