@@ -219,7 +219,11 @@ protected {
 								// if so call it
 								//  if true do following:
 								// if not exist do the following:
-								
+								static if (__traits(hasMember, C, "canView") && typeof(&c.canView).stringof == "bool delegate()") {
+									ret ~= "        if (value.canView()) {\n";
+								} else {
+									ret ~= "        if (true) {\n";
+								}
 								// output it
 								
 								// what format should we output to?
@@ -235,7 +239,7 @@ protected {
 								// check which properties are not allowed.
 								// don't output them
 								// output rest
-								
+								ret ~= "        }\n";
 								ret ~= "    } else {\n";
 								ret ~= "        http_response.statusCode = HTTPStatus.notFound;\n";
 								ret ~= "    }\n";
@@ -256,6 +260,11 @@ protected {
 								// if so call it
 								//  if true do following:
 								// if not exist do the following:
+								static if (__traits(hasMember, C, "canView") && typeof(&c.canView).stringof == "bool delegate()") {
+									ret ~= "        if (value.canView()) {\n";
+								} else {
+									ret ~= "        if (true) {\n";
+								}
 								
 								// output it
 								
@@ -263,7 +272,9 @@ protected {
 								// don't output them
 								// output rest
 								
-								ret ~= "        http_response.writeBody(to!string(outputValue));\n";
+								ret ~= "            http_response.writeBody(to!string(outputValue));\n";
+								
+								ret ~= "        }\n";
 								ret ~= "    } else {\n";
 								ret ~= "        http_response.statusCode = HTTPStatus.notFound;\n";
 								ret ~= "    }\n";
