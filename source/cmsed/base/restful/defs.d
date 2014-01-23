@@ -3,6 +3,7 @@ import cmsed.base.restful.get;
 import cmsed.base.restful.remove;
 import cmsed.base.restful.modify;
 import cmsed.base.restful.create;
+import cmsed.base.restful.query;
 
 /**
  * Provides bit field for or'ing to say what code to generate
@@ -58,6 +59,8 @@ pure string restAllCheck(ushort protection, TYPES...)() {
 	foreach(C; TYPES) {
 		static if ((protection & RestfulProtection.View) != 0) {
 			ret ~= getRestfulData!C();
+			pragma(msg, queryRestfulData!C());
+			ret ~= queryRestfulData!C();
 		}
 		
 		static if ((protection & RestfulProtection.Create) != 0) {
