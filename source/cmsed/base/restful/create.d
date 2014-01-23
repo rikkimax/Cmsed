@@ -11,7 +11,7 @@ pure string createRestfulData(TYPE)() {
 	
 	ret ~= """
 #line 1 \"cmsed.base.restful.create." ~ TYPE.stringof ~ "\"
-@RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "\")
+@RouteFunction(RouteType.Put, \"/" ~ getTableName!TYPE ~ "\")
 void handleRestfulData" ~ TYPE.stringof ~ "Create() {
     import " ~ moduleName!TYPE ~ ";
     auto value = new " ~ TYPE.stringof ~ ";
