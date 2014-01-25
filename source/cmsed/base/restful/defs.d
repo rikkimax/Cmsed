@@ -59,7 +59,6 @@ pure string restAllCheck(ushort protection, TYPES...)() {
 	foreach(C; TYPES) {
 		static if ((protection & RestfulProtection.View) != 0) {
 			ret ~= getRestfulData!C();
-			pragma(msg, queryRestfulData!C());
 			ret ~= queryRestfulData!C();
 		}
 		
