@@ -56,5 +56,20 @@
 				"cmsed:base": "~master",
 			}
 		}
-	]
+	],
+	"buildTypes": {
+		"docs": {
+			"dflags": [
+				"-op",
+				"-Dddocs",
+				"-o-",
+				"-c", 
+				"-Hdimport"
+			],
+			"dependencies": {
+				"cmsed:base": "~master",
+				"cmsed:user": "~master"
+			}
+		}
+	}
 }
