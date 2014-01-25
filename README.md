@@ -13,7 +13,7 @@ Features:
 - Session storage resides in database.
 - Widget registration and usage support. Contains list of all widgets with routes accessible at runtime.
 - Logging of all routes, widgets, data models, access.
-- Automatic running in reload mode. In which it keeps itself up even if it were to fail (unless arg is passed).
+- Can be executed in automatic reload mode. Utilising a command argument. For use in production environement where having it able to be reconfigured and rebooted on error is required.
 
 Examples:
 ---------
@@ -61,6 +61,8 @@ shared static this() {
   registerModel!Book;
 }
 ```
+
+Don't worry about the logMe method on these models! Thats handled and called automatically upon registration.
 
 Note shared is a _required_ part of this. Without it you'll get 8+ registrations of said model (one for each thread).
 Same goes for routing. But here it's more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
