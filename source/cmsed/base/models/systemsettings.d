@@ -9,9 +9,15 @@ import dvorm;
 @dbName("SystemSettings")
 class SystemSettingModel {
 	@dbId {
+		/**
+		 * The name of the setting
+		 */
 		string name;
 	}
 	
+	/**
+	 * The value of the setting
+	 */
 	string value;
 	
 	mixin OrmModel!SystemSettingModel;

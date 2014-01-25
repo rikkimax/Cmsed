@@ -12,6 +12,13 @@ private shared {
 	runOnLoadFunc[] runOnLoadFuncs;
 }
 
+/**
+ * Registers functions to be executed upon load aka pre socket listening.
+ * This can be utilised to modify data models.
+ * 
+ * The function is passed wheather its an install node or a production mode.
+ * This enables only install based addition e.g. example data to be added.
+ */
 void registerOnLoad(runOnLoadFunc func) {
 	synchronized {
 		runOnLoadFuncs ~= func;

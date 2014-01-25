@@ -4,7 +4,6 @@ import dvorm;
 /**
  * Dvorm based data model for usage with the session storage.
  */
-
 @dbName("Session")
 class SessionModel {
 	@dbId {

@@ -20,6 +20,13 @@ private shared {
 	bool shouldReconfigure;
 }
 
+/**
+ * Registers a function to be executed repeatedly.
+ * 
+ * Params:
+ * 		func = 		The function to be executed
+ * 		frequent = 	Should the function be executed every 5 minutes or every hour?
+ */
 void registerUpdate(UpdateFunction func, bool frequent = false) {
 	synchronized {
 		if (frequent)
@@ -29,6 +36,13 @@ void registerUpdate(UpdateFunction func, bool frequent = false) {
 	}
 }
 
+/**
+ * Instructs the system to shutdown and reconfigure itself.
+ * Mostly used for if the base configuration changes.
+ * 
+ * Example:
+ * 		Changing the listening port.
+ */
 void reconfigureSystem() {
 	synchronized {
 		shouldReconfigure = true;
@@ -59,12 +73,18 @@ void addUpdateTask() {
 	});
 }
 
+/**
+ * Internal: Should the system be reconfigured?
+ */
 bool shouldReconfigureSystem() {
 	synchronized {
 		return shouldReconfigure;
 	}
 }
 
+/**
+ * Internal: Reset wheather the system should be reconfigured.
+ */
 void resetShouldReconfigureSystem() {
 	synchronized {
 		shouldReconfigure = false;

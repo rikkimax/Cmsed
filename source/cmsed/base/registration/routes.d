@@ -15,12 +15,19 @@ private shared {
 	configureRouteFunc[] configureInstallRouteFuncs;
 }
 
+/**
+ * Registers a route class to be listend for when in production mode.
+ */
 void registerRoute(C : OORoute)() {
 	synchronized {
 		configureRouteFuncs ~= &registerRouteHandler!C;
 	}
 }
 
+/**
+ * Registers a route class to be listend for when in install mode.
+ * Allows for having an installer.
+ */
 void registerRoute(C : OOInstallRoute)() {
 	synchronized {
 		configureInstallRouteFuncs ~= &registerRouteHandler!C;

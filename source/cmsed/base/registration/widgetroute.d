@@ -12,20 +12,51 @@ private shared {
 	WidgetRoute[] widgetRoutes;
 }
 
+/**
+ * A template/route that utilises a widget.
+ */
 class WidgetRoute {
+	/**
+	 * The file that the template is.
+	 */
 	string file;
+	
+	/**
+	 * Route information related to what this is.
+	 * 
+	 * See_Also:
+	 * 		RouteInformation
+	 */
 	RouteInformation routeInfo;
+	
+	/**
+	 * The name of the widget being asked for.
+	 */
 	string name;
+	
+	/**
+	 * The widget position being hooked into
+	 */
 	string position;
+	
+	/**
+	 * Any extra information being provided.
+	 */
 	string widgetInfo;
 }
 
+/**
+ * All template/routes that can be hooked into
+ */
 WidgetRoute[] getWidgetRoutes() {
 	synchronized {
 		return cast(WidgetRoute[])widgetRoutes;
 	}
 }
 
+/**
+ * Internal: Registers a template/route that has a widget that can be hooked into.
+ */
 void registerWidgetRoute(string file, RouteInformation routeInfo, string name, string position, string widgetInfo) {
 	synchronized {
 		bool isIn = false;

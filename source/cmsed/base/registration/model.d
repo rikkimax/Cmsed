@@ -28,6 +28,10 @@ private shared {
 	}
 }
 
+/**
+ * Registers a dvorm data model.
+ * To be configured and managed by Cmsed.
+ */
 void registerModel(C)() {
 	synchronized {
 		configureModelDatabases ~= &configureModelDatabase!C;
