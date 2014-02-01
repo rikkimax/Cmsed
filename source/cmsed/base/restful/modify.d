@@ -5,9 +5,12 @@ import vibe.data.json;
 import dvorm;
 import std.traits : moduleName;
 
+/**
+ * Dedicated towards creating a route for modifying data models in the database.
+ */
 pure string modifyRestfulData(TYPE)() {
 	string ret;
-	TYPE type = new TYPE;
+	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
 #line 1 \"cmsed.base.restful.modify." ~ TYPE.stringof ~ "\"

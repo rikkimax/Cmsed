@@ -3,9 +3,12 @@ import cmsed.base.restful.defs;
 import dvorm;
 import std.traits : moduleName;
 
+/**
+ * Dedicated to removing data in the database.
+ */
 pure string removeRestfulData(TYPE)() {
 	string ret;
-	TYPE type = new TYPE;
+	TYPE type = newValueOfType!TYPE;
 	ret ~= """
 #line 1 \"cmsed.base.restful.remove." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Delete, \"/" ~ getTableName!TYPE ~ "/:key\")

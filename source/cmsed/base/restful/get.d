@@ -5,9 +5,12 @@ import vibe.data.json;
 import dvorm;
 import std.traits : moduleName;
 
+/**
+ * Dedicated to getting data models from the database.
+ */
 pure string getRestfulData(TYPE)() {
 	string ret;
-	TYPE type = new TYPE;
+	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
 #line 1 \"cmsed.base.restful.get." ~ TYPE.stringof ~ "\"

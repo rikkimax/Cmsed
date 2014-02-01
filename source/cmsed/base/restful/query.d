@@ -5,9 +5,12 @@ import vibe.data.json;
 import dvorm;
 import std.traits : moduleName;
 
+/**
+ * Binds a dvorm query to database query via a route.
+ */
 pure string queryRestfulData(TYPE)() {
 	string ret;
-	TYPE type = new TYPE;
+	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
 #line 1 \"cmsed.base.restful.query." ~ TYPE.stringof ~ "\"
@@ -79,7 +82,7 @@ void handleRestfulData" ~ TYPE.stringof ~ "Query() {
 private {
 	pure string outputRestfulTypeQueryHandler(TYPE, string m)() {
 		string ret;
-		TYPE type = new TYPE;
+		TYPE type = newValueOfType!TYPE;
 		
 		static if (is(typeof(__traits(getMember, type, m)) : Object)) {
 			static if (isUsable!(TYPE, m) && !shouldBeIgnored!(TYPE, m)) {

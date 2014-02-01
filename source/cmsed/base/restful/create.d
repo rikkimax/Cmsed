@@ -5,16 +5,19 @@ import vibe.data.json;
 import dvorm;
 import std.traits : moduleName;
 
+/**
+ * Creates a route dedicated to creating data, and saving to the database.
+ */
 pure string createRestfulData(TYPE)() {
 	string ret;
-	TYPE type = new TYPE;
+	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
 #line 1 \"cmsed.base.restful.create." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Put, \"/" ~ getTableName!TYPE ~ "\")
 void handleRestfulData" ~ TYPE.stringof ~ "Create() {
     import " ~ moduleName!TYPE ~ ";
-    auto value = new " ~ TYPE.stringof ~ ";
+    auto value = newValueOfType!" ~ TYPE.stringof ~ ";
     string formVal;
 """;
 	
