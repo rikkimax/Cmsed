@@ -4,8 +4,6 @@ import cmsed.base.restful;
 import cmsed.test.models.book;
 
 class Test : OORoute {
-	/*@RouteFunction(RouteType.Get, "/", "index")
-	 bool test() {return true;}*/
 	@RouteGroup(null, "/test.svc") {
 		mixin RestfulRoute!(RestfulProtection.All, Book3, Page3);
 	}
