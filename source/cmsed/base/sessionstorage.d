@@ -29,7 +29,7 @@ class DbSessionStore : SessionStore {
 	}
 	
 	/// Returns the value for a given session key.
-	Variant get(string id, string name, Variant defaultVal = null) {
+	Variant get(string id, string name, lazy Variant defaultVal = null) {
 		if (id !is null && name !is null) {
 			SessionModel[] sm = SessionModel.find(id, name);
 			if (sm.length == 1) {
