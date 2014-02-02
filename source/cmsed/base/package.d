@@ -27,6 +27,13 @@ public import cmsed.base.timezones;
  */
 public import cmsed.base.browser_detection;
 
+/**
+ * Mime type information
+ * Based off of the standard at http://www.iana.org/assignments/media-types/media-types.xhtml
+ * Can be utilised for the static files
+ */
+public import cmsed.base.mimetypes;
+
 public import cmsed.base.models;
 public import cmsed.base.registration;
 public import cmsed.base.caches;
