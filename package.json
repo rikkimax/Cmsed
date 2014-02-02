@@ -15,11 +15,13 @@
 			"sourcePaths": ["source/cmsed/base"],
 			"sourceFiles": [
 				"tools/timezone/timezones.d",
-				"tools/browser_detection/browser_detection.d"
+				"tools/browser_detection/browser_detection.d",
+				"tools/mime/mimetypes.d"
 			],
 			"stringImportPaths": [
 				"views/base",
-				"tools/browser_detection"
+				"tools/browser_detection",
+				"tools/mime"
 			],
 			"targetType": "library",
 			"targetPath": "bin/base",
@@ -31,11 +33,16 @@
 		},
 		{
 			"name": "rebuildTools",
-			"targetType": "sourceLibrary",
+			"targetType": "staticLibrary",
 			"preGenerateCommands": [
 				"cd tools/timezone && rdmd generator cmsed.base.timezones",
-				"cd tools/browser_detection && rdmd generator cmsed.base.browser_detection"
+				"cd tools/browser_detection && rdmd generator cmsed.base.browser_detection",
+				"cd tools/mime && rdmd generator cmsed.base.mimetypes"
 			],
+			"sourceFiles": [
+				"tools/main.d",
+			],
+			"sourcePaths": []
 		},
 		{
 			"name": "user",
