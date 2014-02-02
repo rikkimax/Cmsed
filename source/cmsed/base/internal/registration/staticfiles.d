@@ -1,6 +1,8 @@
 module cmsed.base.internal.registration.staticfiles;
 import cmsed.base.routing;
+import cmsed.base.mimetypes;
 import vibe.d;
+import std.path : extension;
 
 private shared {
 	ubyte[][string] staticFiles;
@@ -8,8 +10,18 @@ private shared {
 	string staticPath = "/public";
 }
 
-void registerStaticFile(string name, ubyte[] text, string mime="") {
+void registerStaticFile(string name, ubyte[] text, string mime=null) {
 	synchronized {
+		if (mime is null) {
+			string extension = name.extension();
+			if (extension.length > 1) {
+				mime = getTemplateForType(extension[1 .. $]);
+			}
+			if (mime is null) {
+				mime = "text/plain";
+			}
+		}
+		
 		staticFiles[name] = cast(shared)text;
 		staticTypes[name] = mime;
 	}
