@@ -1,6 +1,7 @@
 module cmsed.base.registration.onload;
 import cmsed.base.registration.model;
 import cmsed.base.registration.routes;
+import cmsed.base.internal.registration.staticfiles;
 
 /**
  * Registers functions to be executed pre update registration and listening.
@@ -37,5 +38,7 @@ void runOnLoad(bool isInstall) {
 		foreach(func; runOnLoadFuncs) {
 			func(isInstall);
 		}
+		
+		configureStaticFiles();
 	}
 }
