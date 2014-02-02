@@ -1,0 +1,4 @@
+*.di
+*.html
+.dub/dub.json
+package.userprefs
