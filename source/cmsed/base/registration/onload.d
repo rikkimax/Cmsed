@@ -33,12 +33,12 @@ void registerOnLoad(runOnLoadFunc func) {
 void runOnLoad(bool isInstall) {
 	synchronized {
 		configureModels();
-		configureRoutes(isInstall);
 		
 		foreach(func; runOnLoadFuncs) {
 			func(isInstall);
 		}
 		
+		configureRoutes(isInstall);
 		configureStaticFiles();
 	}
 }
