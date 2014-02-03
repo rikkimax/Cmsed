@@ -3,6 +3,7 @@ import cmsed.base.routing;
 import cmsed.base.mimetypes;
 import vibe.d;
 import std.path : extension;
+import std.string : toLower;
 
 private shared {
 	ubyte[][string] staticFiles;
@@ -16,6 +17,8 @@ void registerStaticFile(string name, string text, string mime=null) {
 
 void registerStaticFile(string name, ubyte[] text, string mime=null) {
 	synchronized {
+		name = name.toLower();
+		
 		if (mime is null) {
 			string extension = name.extension();
 			
@@ -43,7 +46,7 @@ void configureStaticFiles() {
 	synchronized {
 		void staticHandler(HTTPServerRequest req, HTTPServerResponse res) {
 			enforce(req.path.length > staticPath.length, "Umm how did this happen?");
-			string path = req.path[staticPath.length .. $];
+			string path = req.path[staticPath.length .. $].toLower();
 			
 			if (path in staticFiles) {
 				res.writeBody(cast(ubyte[])staticFiles[path], staticTypes[path]);
