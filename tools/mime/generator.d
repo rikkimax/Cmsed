@@ -24,36 +24,54 @@ void main(string[] args) {
 	
 	string names;
 	string values;
+	string extensions;
+	string extensionNames;
 	names ~= "immutable mimeTypes = [\n";
 	values ~= "immutable mimeTemplates = [\n";
+	extensionNames ~= "immutable mimeExtensionNames = [\n";
+	extensions ~= "immutable mimeExtensions = [\n";
 	
-	foreach(i, string line; (
-		readText("application.csv") ~
-		readText("audio.csv") ~
-		readText("image.csv") ~
-		readText("model.csv") ~ 
-		readText("multipart.csv") ~ 
-		readText("text.csv") ~ 
-		readText("video.csv")).splitLines()) {
+	foreach (file; ["application", "audio", "image", "model", "multipart", "text", "video"]) {
+		foreach(i, string line; readText(file ~ ".csv").splitLines()) {
+			if (i == 0) continue;
+			
+			string[] items = line.split(",");
+			if (items.length >= 2) {
+				names ~= "    \"" ~ items[0] ~ "\",\n";
+				if (items[1] !is null && items[1] != "")
+					values ~= "    \"" ~ items[1] ~ "\",\n";
+				else
+					values ~= "    \"" ~ file ~ "/" ~ items[0] ~ "\",\n";
+			}
+		}
+	}
+	
+	foreach(i, string line; readText("extensionNames.csv").splitLines()) {
 		if (i == 0) continue;
 		
 		string[] items = line.split(",");
 		if (items.length >= 2) {
-			names ~= "    \"" ~ items[0] ~ "\",\n";
-			if (items[1] !is null && items[1] != "")
-				values ~= "    \"" ~ items[1] ~ "\",\n";
-			else
-				values ~= "    \"" ~ items[0] ~ "\",\n";
+			foreach(value; items[1 .. $]) {
+				extensionNames ~= "    \"" ~ items[0] ~ "\",\n";
+				extensions ~= "    \"" ~ value ~ "\",\n";
+			}
 		}
 	}
 	
 	names.length -= 2;
 	values.length -= 2;
+	extensionNames.length -= 2;
+	extensions.length -= 2;
+	
 	names ~= "\n";
 	values ~= "\n";
+	extensionNames ~= "\n";
+	extensions ~= "\n";
 	
 	names ~= "];";
 	values ~= "];";
+	extensionNames ~= "];";
+	extensions ~= "];";
 	
 	string funcs = """
 pure string getTemplateForType(string type) {
@@ -65,7 +83,23 @@ pure string getTemplateForType(string type) {
 
     return null;
 }
+
+pure string getNameFromExtension(string name) {
+	foreach(i, mt; mimeExtensions) {
+        if (mt == name) {
+            return mimeExtensionNames[i];
+        }
+    }
+
+    return getTemplateForType(name);
+}
 """;
 	
-	write(fileName, "module " ~ moduleName ~ ";\n" ~ funcs ~ "\n" ~ names ~ "\n" ~ values ~ "\n");
+	write(fileName,
+		"module " ~ moduleName ~ ";\n" ~
+		funcs ~ "\n" ~
+		names ~ "\n" ~
+		values ~ "\n" ~
+		extensionNames ~ "\n" ~
+		extensions ~ "\n");
 }
