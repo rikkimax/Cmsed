@@ -10,18 +10,24 @@ private shared {
 	string staticPath = "/public";
 }
 
+void registerStaticFile(string name, string text, string mime=null) {
+	registerStaticFile(name, cast(ubyte[])text, mime);
+}
+
 void registerStaticFile(string name, ubyte[] text, string mime=null) {
 	synchronized {
 		if (mime is null) {
 			string extension = name.extension();
+			
 			if (extension.length > 1) {
-				mime = getTemplateForType(extension[1 .. $]);
+				mime = getNameFromExtension(extension[1 .. $]);
+				if (mime !is null)
+					mime = getTemplateForType(mime);
 			}
 			if (mime is null) {
 				mime = "text/plain";
 			}
 		}
-		
 		staticFiles[name] = cast(shared)text;
 		staticTypes[name] = mime;
 	}
@@ -45,5 +51,15 @@ void configureStaticFiles() {
 		}
 		
 		getURLRouter().match(HTTPMethod.GET, staticPath ~ "/*", &staticHandler);
+		
+		// logging
+		
+		string oFile;
+		foreach(path; staticFiles.keys) {
+			oFile ~= "get:" ~ staticPath ~ path ~ "\n";
+		}
+		
+		string logFile = buildPath(configuration.logging.dir, configuration.logging.routeFile);
+		append(logFile, "=======-----=======\n" ~ oFile);
 	}
 }
