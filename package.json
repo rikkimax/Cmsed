@@ -21,7 +21,8 @@
 			"stringImportPaths": [
 				"views/base",
 				"tools/browser_detection",
-				"tools/mime"
+				"tools/mime",
+				"libraries/js"
 			],
 			"targetType": "library",
 			"targetPath": "bin/base",

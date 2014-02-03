@@ -1,5 +1,6 @@
 module cmsed.base.registration.model;
 import cmsed.base.config;
+import cmsed.base.internal.generators.js.model;
 import dvorm.logging;
 import std.file : write;
 import std.path : buildPath;
@@ -39,6 +40,8 @@ void registerModel(C)() {
 		static if (__traits(compiles, { configureModelDatabasesOnInitFunc f = &C.init;})) {
 			configureModelDatabasesOnInit ~= C.init();
 		}
+		
+		generateJavascriptModel!C;
 	}
 }
 
