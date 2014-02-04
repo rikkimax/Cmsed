@@ -9,6 +9,7 @@ import vbson = vibe.data.bson;
  * A user to group joining model.
  */
 @dbName("UserGroup")
+@shouldNotGenerateJavascriptModel
 class UserGroupModel {
 	@dbId {
 		@dbName("_id")

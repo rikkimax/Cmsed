@@ -1,6 +1,11 @@
 module cmsed.base.internal.generators.js.model.defs;
 import cmsed.base.internal.registration.staticfiles;
+import cmsed.base.internal.generators.js.model.generate;
 import cmsed.base.registration.onload;
+import cmsed.base.restful.defs;
+import dvorm.util;
+import std.traits : isBasicType, isBoolean;
+import std.functional : toDelegate;
 
 enum OOPHandler : string {
 	JSFace2_2_0 = import("jsface2.2.0_min.js"),
@@ -12,11 +17,14 @@ enum AjaxHandler : string {
 	Prototype = Prototype1_7_1
 }
 
+struct shouldNotGenerateJavascriptModel {}
+struct ignoreGenerateJavascriptModel {}
+
 /**
  * Properties
  */
 
-private shared {
+protected shared {
 	string pathToOOPHandler = "/js/oopHandler";
 	OOPHandler oopHandler = OOPHandler.JSFace;
 	
@@ -25,6 +33,11 @@ private shared {
 	
 	string pathToAjaxHandler = "/js/ajaxHandler";
 	AjaxHandler ajaxHandler = AjaxHandler.Prototype;
+	
+	alias string delegate() modelBindingGetFunc;
+	modelBindingGetFunc[string] bindingFuncs;
+	
+	bool disableGeneration = false;
 }
 
 void pathOfOOPHandler(string path) {
@@ -63,27 +76,79 @@ void setAjaxHandler(AjaxHandler handler) {
 	}
 }
 
+void disableJavascriptGeneration() {
+	synchronized {
+		disableGeneration = true;
+	}
+}
+
 /**
  * functions
  */
 
-void generateJavascriptModel(T)() {
+/**
+ * Creates a javascript model from a data model
+ * 
+ * Compliant with a dvorm data model.
+ * Wraps a dvorm query and hooking it via ajax.
+ * 
+ * Params:
+ * 		T = 				The data model to be based upon
+ * 		ajaxProtection = 	The restful protection to work with for generation
+ * 		overrideChecks = 	Forces the generation of this model. Meant for manual generation
+ */
+void generateJavascriptModel(T, ushort ajaxProtection = RestfulProtection.All, bool overrideChecks = false)() {
 	synchronized {
-		
+		static if (overrideChecks) {
+			bindingFuncs[getTableName!T] = toDelegate(cast(shared)&(generateJsFunc!(T, ajaxProtection)));
+		} else static if (shouldGenerateJavascriptModel!T) {
+			if (!disableGeneration) {
+				bindingFuncs[getTableName!T] = toDelegate(cast(shared)&(generateJsFunc!(T, ajaxProtection)));
+			}
+		}
+	}
+}
+
+pure bool shouldGenerateJavascriptModel(T)() {
+	foreach(UDA; __traits(getAttributes, T)) {
+		static if (is(UDA == shouldNotGenerateJavascriptModel)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+pure bool shouldIgnoreGenerateJavascriptModel(T, string m)() {
+	T c = newValueOfType!T;
+	
+	static if (__traits(compiles, __traits(getProtection, mixin("c." ~ m))) &&
+	           __traits(getProtection, mixin("c." ~ m)) == "public") {
+		foreach(UDA; __traits(getAttributes, mixin("c." ~ m))) {
+			static if (is(UDA : ignoreGenerateJavascriptModel)) {
+				return true;
+			}
+		}
+		return false;
+	} else {
+		return true;
 	}
 }
 
 shared static this() {
 	void jsModel(bool isInstall) {
-		registerStaticFile(pathToOOPHandler, cast(string)oopHandler, null);
-		registerStaticFile(pathToAjaxHandler, cast(string)ajaxHandler, null);
+		registerStaticFile(pathToOOPHandler, cast(string)oopHandler, "javascript");
+		registerStaticFile(pathToAjaxHandler, cast(string)ajaxHandler, "javascript");
 		
 		foreach(name; __traits(allMembers, OOPHandler)) {
-			registerStaticFile(pathToLibraries ~ name, cast(string)__traits(getMember, OOPHandler, name), null);
+			registerStaticFile(pathToLibraries ~ name, cast(string)__traits(getMember, OOPHandler, name), "javascript");
 		}
 		
 		foreach(name; __traits(allMembers, AjaxHandler)) {
-			registerStaticFile(pathToLibraries ~ name, cast(string)__traits(getMember, AjaxHandler, name), null);
+			registerStaticFile(pathToLibraries ~ name, cast(string)__traits(getMember, AjaxHandler, name), "javascript");
+		}
+		
+		foreach(name, value; bindingFuncs) {
+			registerStaticFile(pathToOOPClasses ~ name, value(), "javascript");
 		}
 	}
 	

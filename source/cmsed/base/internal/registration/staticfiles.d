@@ -24,13 +24,16 @@ void registerStaticFile(string name, ubyte[] text, string mime=null) {
 			
 			if (extension.length > 1) {
 				mime = getNameFromExtension(extension[1 .. $]);
-				if (mime !is null)
-					mime = getTemplateForType(mime);
 			}
 			if (mime is null) {
 				mime = "text/plain";
 			}
 		}
+		string mimebk = mime;
+		mime = getTemplateForType(mime);
+		if (mime is null)
+			mime = mimebk;
+		
 		staticFiles[name] = cast(shared)text;
 		staticTypes[name] = mime;
 	}

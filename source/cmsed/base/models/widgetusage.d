@@ -1,4 +1,5 @@
 module cmsed.base.models.widgetusage;
+import cmsed.base.internal.generators.js.model.defs;
 import dvorm;
 
 /**
@@ -7,6 +8,7 @@ import dvorm;
  */
 
 @dbName("Widgets")
+@shouldNotGenerateJavascriptModel
 class WidgetUsageModel {
 	@dbId {
 		/**

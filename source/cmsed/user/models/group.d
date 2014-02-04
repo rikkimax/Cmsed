@@ -9,6 +9,7 @@ import vbson = vibe.data.bson;
  * A group model to contain a list of users with.
  */
 @dbName("Group")
+@shouldNotGenerateJavascriptModel
 class GroupModel {
 	/**
 	 * The id to use. Is generated.

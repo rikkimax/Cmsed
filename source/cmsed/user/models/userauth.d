@@ -10,6 +10,7 @@ import std.base64;
  * Provides database storage for the default user authentication provider.
  */
 @dbName("UserAuth")
+@shouldNotGenerateJavascriptModel
 class UserAuthModel {
 	@dbId {
 		/**

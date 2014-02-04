@@ -1,10 +1,12 @@
 module cmsed.base.models.session;
+import cmsed.base.internal.generators.js.model.defs;
 import dvorm;
 
 /**
  * Dvorm based data model for usage with the session storage.
  */
 @dbName("Session")
+@shouldNotGenerateJavascriptModel
 class SessionModel {
 	@dbId {
 		string key;

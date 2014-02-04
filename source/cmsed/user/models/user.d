@@ -10,6 +10,7 @@ import std.string : split;
  * A user.
  */
 @dbName("User")
+@shouldNotGenerateJavascriptModel
 class UserModel {
 	/**
 	 * A unique identifer.

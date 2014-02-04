@@ -1,4 +1,5 @@
 module cmsed.base.models.systemsettings;
+import cmsed.base.internal.generators.js.model.defs;
 import dvorm;
 
 /**
@@ -7,6 +8,7 @@ import dvorm;
  */
 
 @dbName("SystemSettings")
+@shouldNotGenerateJavascriptModel
 class SystemSettingModel {
 	@dbId {
 		/**
