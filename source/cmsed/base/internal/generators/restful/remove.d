@@ -1,5 +1,5 @@
-module cmsed.base.restful.remove;
-import cmsed.base.restful.defs;
+module cmsed.base.internal.generators.restful.remove;
+import cmsed.base.internal.generators.restful.defs;
 import dvorm;
 import std.traits : moduleName;
 
@@ -10,7 +10,7 @@ pure string removeRestfulData(TYPE)() {
 	string ret;
 	TYPE type = newValueOfType!TYPE;
 	ret ~= """
-#line 1 \"cmsed.base.restful.remove." ~ TYPE.stringof ~ "\"
+#line 1 \"cmsed.base.internal.generators.restful.remove." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Delete, \"/" ~ getTableName!TYPE ~ "/:key\")
 void handleRestfulData" ~ TYPE.stringof ~ "Delete() {
     import " ~ moduleName!TYPE ~ ";

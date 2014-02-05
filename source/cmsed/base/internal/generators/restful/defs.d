@@ -1,9 +1,9 @@
-module cmsed.base.restful.defs;
-import cmsed.base.restful.get;
-import cmsed.base.restful.remove;
-import cmsed.base.restful.modify;
-import cmsed.base.restful.create;
-import cmsed.base.restful.query;
+module cmsed.base.internal.generators.restful.defs;
+import cmsed.base.internal.generators.restful.get;
+import cmsed.base.internal.generators.restful.remove;
+import cmsed.base.internal.generators.restful.modify;
+import cmsed.base.internal.generators.restful.create;
+import cmsed.base.internal.generators.restful.query;
 
 /**
  * Provides bit field for or'ing to say what code to generate
@@ -51,7 +51,7 @@ mixin template RestfulRoute(ushort protection, TYPES...) {
 	import vibe.data.json;
 	import std.conv : to;
 	mixin(restAllCheck!(protection, TYPES));
-#line 50 "cmsed.base.restful.defs"
+#line 50 "cmsed.base.internal.generators.restful.defs"
 }
 
 pure string restAllCheck(ushort protection, TYPES...)() {
