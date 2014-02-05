@@ -8,12 +8,12 @@ import std.traits : isBasicType, isBoolean;
 import std.functional : toDelegate;
 
 enum OOPHandler : string {
-	JSFace2_2_0 = import("jsface2.2.0_min.js"),
+	JSFace2_2_0 = import("jsface2.2.0.js"),
 	JSFace = JSFace2_2_0
 }
 
 enum AjaxHandler : string {
-	Prototype1_7_1 = import("prototype1.7.1_min.js"),
+	Prototype1_7_1 = import("prototype1.7.1.js"),
 	Prototype = Prototype1_7_1
 }
 
