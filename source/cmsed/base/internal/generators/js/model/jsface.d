@@ -2,12 +2,12 @@ module cmsed.base.internal.generators.js.model.jsface;
 import cmsed.base.internal.generators.js.model.defs;
 import dvorm.util;
 
-void handleClassStartJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props) {
+void handleClassStartJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 	ret ~= "var " ~ getTableName!T ~ " = Class({\n";
 	constructorArgs ~= "    constructor: function(";
 }
 
-void handleClassEndJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props) {
+void handleClassEndJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 	if (constructorArgs[$-2] == ',')
 		constructorArgs.length -= 2;
 	constructorArgs ~= ") {\n";
@@ -29,12 +29,15 @@ void handleClassEndJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref 
 		ret ~= '\n';
 	}
 	
-	ret ~= "});";
+	ret ~= "});\n";
+}
+
+void handleFileEndJSFace(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 }
 
 void handleClassPropertyObjectPropertyJSFace(T, ushort ajaxProtection, string m, string n, // params
-										     T t = newValueOfType!T, U = typeof(mixin("t." ~ m)), V = typeof(mixin("t." ~ m ~ "." ~ n)) // meta info that is needed but not available inside the function
-											 )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props) {
+                                             T t = newValueOfType!T, U = typeof(mixin("t." ~ m)), V = typeof(mixin("t." ~ m ~ "." ~ n)) // meta info that is needed but not available inside the function
+                                             )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 	string name1 = getNameValue!(T, m);
 	string name2 = getNameValue!(U, n);
 	
@@ -49,8 +52,8 @@ void handleClassPropertyObjectPropertyJSFace(T, ushort ajaxProtection, string m,
 }
 
 void handleClassPropertyJSFace(T, ushort ajaxProtection, string m, // params
-							   T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
-							   )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props) {
+                               T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
+                               )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 	string name = getNameValue!(T, m);
 	if (name == "")
 		name = "_";
@@ -67,8 +70,8 @@ void handleClassPropertyJSFace(T, ushort ajaxProtection, string m, // params
 }
 
 void handleClassPropertyRelationshipJSFace(T, ushort ajaxProtection, string m, // params
-										   T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
-											)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props) {
+                                           T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
+                                           )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
 	mixin("import " ~ getRelationshipClassModuleName!(T, m) ~ ";");
 	string name = getTableName!(mixin(getRelationshipClassName!(T, m)));
 	
