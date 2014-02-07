@@ -7,6 +7,8 @@ void handleClassStartPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)
     data.saveprop ~= "       var this_ = this;\n";
     data.saveprop ~= "       new Ajax.Request(\"" ~ pathToOOPClasses ~ getTableName!T ~ "/\" + this.";
     
+    data.savepropParams ~= "            parameters: {\n";
+    
     data.removeprop ~= "    remove: function() {\n";
     data.removeprop ~= "       var this_ = this;\n";
     data.removeprop ~= "       new Ajax.Request(\"" ~ pathToOOPClasses ~ getTableName!T ~ "/\" + this.";
@@ -17,8 +19,14 @@ void handleClassStartPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)
 }
 
 void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
+	if (data.savepropParams[$-2] == ',') {
+			data.savepropParams.length -= 2;
+			data.savepropParams ~= '\n';
+	}
+	data.savepropParams ~= "            },";
     data.saveprop ~= """,  {
             method: \"POST\",
+" ~ data.savepropParams ~ "
             onSuccess: function(event) {
                 onSaveOfObject(this_, event);
             },
@@ -74,7 +82,8 @@ void handleClassPropertyObjectPropertyPrototype(T, ushort ajaxProtection, string
             data.findOneSet ~= name1 ~ "_" ~ name2;
             data.saveprop ~= name1 ~ "_" ~ name2;
             data.removeprop ~= name1 ~ "_" ~ name2;
-			data.findOneSetArgs ~= "ret." ~ name1 ~ "_" ~ name2;
+            data.findOneSetArgs ~= "ret." ~ name1 ~ "_" ~ name2;
+			data.savepropParams ~= "                " ~ name1 ~ "_" ~ name2 ~ ": this_." ~ name1 ~ "_" ~ name2 ~ ",\n";
         }
     }
 }
@@ -93,7 +102,8 @@ void handleClassPropertyPrototype(T, ushort ajaxProtection, string m, // params
             data.findOneSet ~= name;
             data.saveprop ~= name;
             data.removeprop ~= name;
-			data.findOneSetArgs ~= "ret." ~ name ~ ", ";
+            data.findOneSetArgs ~= "ret." ~ name ~ ", ";
+			data.savepropParams ~= "                " ~ name ~ ": this_." ~ name ~ ",\n";
         }
     }
 }

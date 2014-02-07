@@ -14,6 +14,8 @@ struct GenerateData {
 	string props;
 	
 	string saveprop;
+	string savepropParams;
+	
 	string removeprop;
 	
 	string findOneArgs;
