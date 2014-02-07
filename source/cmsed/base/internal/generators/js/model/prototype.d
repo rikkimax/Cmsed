@@ -14,8 +14,7 @@ void handleClassStartPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)
     data.removeprop ~= "       new Ajax.Request(\"" ~ pathToOOPClasses ~ getTableName!T ~ "/\" + this.";
     
     data.findOneArgs ~= getTableName!T ~ ".prototype.findOne = function(";
-    data.findOneSet ~= """    var ret;
-    new Ajax.Request(\"" ~ pathToOOPClasses ~ getTableName!T ~ "/\" + """;
+    data.findOneSet ~= """    var ret = new Ajax.Request(\"" ~ pathToOOPClasses ~ getTableName!T ~ "/\" + """;
 }
 
 void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
