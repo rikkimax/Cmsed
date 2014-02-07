@@ -7,19 +7,10 @@ import std.traits : isBasicType, isBoolean;
 
 string generateJsFunc(T, ushort ajaxProtection)() {
 	T t = newValueOfType!T;
-	string ret;
-	string constructorArgs;
-	string constructorSet;
-	string props;
 	
-	string saveprop;
-	string removeprop;
+	GenerateData data;
 	
-	string findOneArgs;
-	string findOneSet;
-	string findOneSetArgs;
-	
-	handleClassStart!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+	handleClassStart!(T, ajaxProtection)(data);
 	
 	foreach(m; __traits(allMembers, T)) {
 		static if (isUsable!(T, m) && !shouldBeIgnored!(T, m)) {
@@ -31,7 +22,7 @@ string generateJsFunc(T, ushort ajaxProtection)() {
 								static if (isAnId!(typeof(mixin("t." ~ m)), n)) {
 									static if (isAnObjectType!(typeof(mixin("t." ~ m ~ "." ~ n)))) {
 									} else {
-										handleClassPropertyObjectProperty!(T, ajaxProtection, m, n)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+										handleClassPropertyObjectProperty!(T, ajaxProtection, m, n)(data);
 									}
 								}
 							}
@@ -39,35 +30,35 @@ string generateJsFunc(T, ushort ajaxProtection)() {
 					}
 					
 					static if (isActualRelationship!(T, m)) {
-						handleClassPropertyRelationship!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+						handleClassPropertyRelationship!(T, ajaxProtection, m)(data);
 					}
 				} else {
-					handleClassProperty!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+					handleClassProperty!(T, ajaxProtection, m)(data);
 				}
 			}
 		}
 	}
 	
-	handleClassEnd!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
-	handleFileEnd!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+	handleClassEnd!(T, ajaxProtection)(data);
+	handleFileEnd!(T, ajaxProtection)(data);
 	
-	return ret;
+	return data.ret;
 }
 
 /**
  * Creates a variable associated with a specific OOP handler in javascript.
  */
-void handleClassStart(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+void handleClassStart(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleClassStartJSFace!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassStartJSFace!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
 	}
 	switch(ajaxHandler) {
 		case AjaxHandler.Prototype:
-			handleClassStartPrototype!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassStartPrototype!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
@@ -77,17 +68,17 @@ void handleClassStart(T, ushort ajaxProtection, T t = newValueOfType!T)(ref stri
 /**
  * Finishes the javascript associated with a given OOP handler.
  */
-void handleClassEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+void handleClassEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
 	switch(ajaxHandler) {
-			case AjaxHandler.Prototype:
-			handleClassEndPrototype!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+		case AjaxHandler.Prototype:
+			handleClassEndPrototype!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
 	}
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleClassEndJSFace!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassEndJSFace!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
@@ -97,17 +88,17 @@ void handleClassEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string
 /**
  * Finishes the javascript associated with a given OOP handler.
  */
-void handleFileEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+void handleFileEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
 	switch(ajaxHandler) {
-			case AjaxHandler.Prototype:
-			handleFileEndPrototype!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+		case AjaxHandler.Prototype:
+			handleFileEndPrototype!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
 	}
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleFileEndJSFace!(T, ajaxProtection)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleFileEndJSFace!(T, ajaxProtection)(data);
 			break;
 		default:
 			break;
@@ -119,17 +110,17 @@ void handleFileEnd(T, ushort ajaxProtection, T t = newValueOfType!T)(ref string 
  */
 void handleClassPropertyObjectProperty(T, ushort ajaxProtection, string m, string n, // params
                                        T t = newValueOfType!T, U = typeof(mixin("t." ~ m)), V = typeof(mixin("t." ~ m ~ "." ~ n)) // meta info that is needed but not available inside the function
-                                       )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+                                       )(ref GenerateData data) {
 	switch(ajaxHandler) {
-			case AjaxHandler.Prototype:
-			handleClassPropertyObjectPropertyPrototype!(T, ajaxProtection, m, n)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+		case AjaxHandler.Prototype:
+			handleClassPropertyObjectPropertyPrototype!(T, ajaxProtection, m, n)(data);
 			break;
 		default:
 			break;
 	}
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleClassPropertyObjectPropertyJSFace!(T, ajaxProtection, m, n)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassPropertyObjectPropertyJSFace!(T, ajaxProtection, m, n)(data);
 			break;
 		default:
 			break;
@@ -141,17 +132,17 @@ void handleClassPropertyObjectProperty(T, ushort ajaxProtection, string m, strin
  */
 void handleClassProperty(T, ushort ajaxProtection, string m, // params
                          T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
-                         )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+                         )(ref GenerateData data) {
 	switch(ajaxHandler) {
-			case AjaxHandler.Prototype:
-			handleClassPropertyPrototype!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+		case AjaxHandler.Prototype:
+			handleClassPropertyPrototype!(T, ajaxProtection, m)(data);
 			break;
 		default:
 			break;
 	}
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleClassPropertyJSFace!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassPropertyJSFace!(T, ajaxProtection, m)(data);
 			break;
 		default:
 			break;
@@ -163,17 +154,17 @@ void handleClassProperty(T, ushort ajaxProtection, string m, // params
  */
 void handleClassPropertyRelationship(T, ushort ajaxProtection, string m, // params
                                      T t = newValueOfType!T, U = typeof(mixin("t." ~ m)) // meta info that is needed but not available inside the function
-                                     )(ref string ret, ref string constructorArgs, ref string constructorSet, ref string props, ref string saveprop, ref string removeprop, ref string findOneArgs, ref string findOneSet, ref string findOneSetArgs) {
+                                     )(ref GenerateData data) {
 	switch(ajaxHandler) {
 		case AjaxHandler.Prototype:
-			handleClassPropertyRelationshipPrototype!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassPropertyRelationshipPrototype!(T, ajaxProtection, m)(data);
 			break;
 		default:
 			break;
 	}
 	switch(oopHandler) {
 		case OOPHandler.JSFace:
-			handleClassPropertyRelationshipJSFace!(T, ajaxProtection, m)(ret, constructorArgs, constructorSet, props, saveprop, removeprop, findOneArgs, findOneSet, findOneSetArgs);
+			handleClassPropertyRelationshipJSFace!(T, ajaxProtection, m)(data);
 			break;
 		default:
 			break;

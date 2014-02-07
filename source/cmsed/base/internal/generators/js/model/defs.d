@@ -7,6 +7,20 @@ import dvorm.util;
 import std.traits : isBasicType, isBoolean;
 import std.functional : toDelegate;
 
+struct GenerateData {
+	string ret;
+	string constructorArgs;
+	string constructorSet;
+	string props;
+	
+	string saveprop;
+	string removeprop;
+	
+	string findOneArgs;
+	string findOneSet;
+	string findOneSetArgs;
+}
+
 enum OOPHandler : string {
 	JSFace2_2_0 = import("jsface2.2.0.js"),
 	JSFace = JSFace2_2_0
