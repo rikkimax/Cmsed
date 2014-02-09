@@ -1,10 +1,6 @@
 module cmsed.base.internal.generators.js.model.defs;
 import cmsed.base.internal.generators.js.model.generate;
-<<<<<<< HEAD
-import cmsed.base.internal.generators.restful.defs;
 import cmsed.base.internal.registration.staticfiles;
-=======
->>>>>>> parent of c92051f... Hey look ma, the restful api generator is internal!
 import cmsed.base.registration.onload;
 import cmsed.base.restful.defs;
 import dvorm.util;
