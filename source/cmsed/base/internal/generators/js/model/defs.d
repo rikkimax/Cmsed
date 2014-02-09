@@ -1,7 +1,7 @@
 module cmsed.base.internal.generators.js.model.defs;
-import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.internal.generators.js.model.generate;
 import cmsed.base.internal.generators.restful.defs;
+import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.registration.onload;
 import dvorm.util;
 import std.traits : isBasicType, isBoolean;
@@ -54,6 +54,7 @@ protected shared {
 	modelBindingGetFunc[string] bindingFuncs;
 	
 	bool disableGeneration = false;
+	string pathToRestfulRoute = "/.svc/";
 }
 
 void pathOfOOPHandler(string path) {
@@ -95,6 +96,12 @@ void setAjaxHandler(AjaxHandler handler) {
 void disableJavascriptGeneration() {
 	synchronized {
 		disableGeneration = true;
+	}
+}
+
+void pathOfRestfulRoute(string path) {
+	synchronized {
+		pathToRestfulRoute = path;
 	}
 }
 
