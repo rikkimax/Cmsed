@@ -18,13 +18,14 @@ import core.time : Duration;
 class Configuration {
 	Database globalDatabase = new Database;
 	
-	@optional
-	Database[string] modelDatabases;
-	
-	BindData bind = new BindData;
-	
-	@optional
-	Logging logging = new Logging;
+	@optional {
+		Database[string] modelDatabases;
+		
+		BindData bind = new BindData;
+		BindNodeCommunicationData bindNodeCoummunication = new BindNodeCommunicationData;
+		
+		Logging logging = new Logging;
+	}
 }
 
 class Database {
@@ -60,6 +61,13 @@ class ShardDatabase {
 
 class BindData {
 	string[] ip;
+	ushort port;
+	
+	@optional
+	SslConfigData ssl;// = new SslConfigData;
+}
+
+class BindNodeCommunicationData {
 	ushort port;
 	
 	@optional

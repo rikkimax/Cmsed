@@ -8,7 +8,10 @@ import dvorm;
 import std.path : buildPath;
 import std.file : write;
 import std.process : execute;
+import getopt = std.getopt;
+import std.string : toLower, split;
 import core.time : dur;
+import core.runtime;
 
 /**
  * A main function that makes sure a node stays up
@@ -21,22 +24,11 @@ import core.time : dur;
 version(ExcludeCmsedMain) {
 } else {
 	int main(string[] args) {
-		bool runForever = false;
-		bool isInstallMode = false;
-		getOption("forever", &runForever, "Runs the web service continuesly even upon error");
-		getOption("install|i", &isInstallMode, "Starts an iteration of the web service in install mode");
+		bool runForever;
+		bool isInstallMode;
 		
-		try {
-			if (finalizeCommandLineOptions()) {
-				// worked fine
-			} else {
-				// DIE (printed help)
-				return 0;
-			}
-		} catch (Exception e) {
-			// DIE (something something bye bye)
-			return 0;
-		}
+		int retHelpValue = handleHelp(runForever, isInstallMode);
+		if (retHelpValue < 0) return retHelpValue;
 		
 		lowerPrivileges();
 		if (!runForever) {
@@ -49,10 +41,9 @@ version(ExcludeCmsedMain) {
 						// died because of reconfiguration.
 						// lets keep going!
 						break;
+					case -2:
 					case -1:
-						// umm shouldn't be touched
-					case 0:
-						// printed out help :/
+						// tried to print help and died
 					case 1:
 						// in this case it was forcefull closed
 					default:
@@ -67,7 +58,84 @@ version(ExcludeCmsedMain) {
 	}
 }
 
+/**
+ * Help messages, as well as basic arguments to program.
+ * 
+ * Good idea to define all arguments here even if not parsed here
+ * That way the help message will be helpful!
+ * 
+ * Params:
+ * 		runForever = 	Should this program run forever? Basically auto restart itself.
+ * 		isInstallMode = Are we installing ourselves against the stack?
+ */
+int handleHelp(out bool runForever, out bool isInstallMode) {
+	bool modeHelp;
+	
+	getOption("forever", &runForever, "Runs the web service continuesly even upon error");
+	getOption("install|i", &isInstallMode, "Starts an iteration of the web service in install mode");
+	getOption("mode", &modeHelp, "Sets the mode to start in. Valid modes: Web, Backend");
+	
+	try {
+		if (finalizeCommandLineOptions()) {
+			// worked fine
+			return 0;
+		} else {
+			// DIE (printed help)
+			return -2;
+		}
+	} catch (Exception e) {
+		// DIE (something something bye bye)
+		return -1;
+	}
+}
+
+/**
+ * Gets the mode being used by this node.
+ * 
+ * Defaults:
+ * 		isWebMode =		true
+ * 						By default we assume we host a web server
+ * 		isBackendMode = false
+ * 						By default we don't serve as a backend
+ *                      Communication to backend servers is still available without this
+ * 						They cannot communicate with you however
+ * 
+ * Params:
+ * 		isWebMode = 	Should this node start the web server?
+ * 		isBackendMode = Should this node care about hosting a backend functionality?
+ */
+void handleModeArg(out bool isWebMode, out bool isBackendMode) {
+	string[] args = Runtime.args;
+	string mode;
+	getopt.getopt(args, "mode", &mode);
+	
+	if (mode.length == 0) {
+		isWebMode = true;
+	} else {
+		foreach(m; mode.toLower().split(",")) {
+			switch(m) {
+				case "web":
+					isWebMode = true;
+					break;
+				case "backend":
+					isBackendMode = true;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+/**
+ * Runs a single iteration of the node.
+ * Weather this is in the form of a web server or backend node depends solely upon cli arguments.
+ */
 bool runIteration(bool isInstall) {
+	bool isWebMode;
+	bool isBackendMode;
+	handleModeArg(isWebMode, isBackendMode);
+	
 	try  {
 		getConfiguration("base.json");
 		
@@ -79,24 +147,33 @@ bool runIteration(bool isInstall) {
 			addUpdateTask();
 		}
 		
-		// add public directory for static content
-		getURLRouter().get("*", serveStaticFiles("./public/",));
+		if (isBackendMode) {
+			// hey look we're a backend node!
+		}
 		
-		// There was dependency problems with having this inside config.
-		// As pretty much everything used config at some stage.
-		// Basically module ctors/dtors had cyclic dependencies. Moving here fixed that.
-		// Blame Session storage.
-		HTTPServerSettings settings = new HTTPServerSettings();
-		settings.port = configuration.bind.port;
-		settings.bindAddresses = cast(string[])configuration.bind.ip;
-		settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
-		settings.sessionStore = new DbSessionStore;
-		
-		if (configuration.bind.ssl.cert != "" && configuration.bind.ssl.key != "")
-			settings.sslContext = new SSLContext(configuration.bind.ssl.cert, configuration.bind.ssl.key);
-		
-		listenHTTP(settings, getURLRouter());
-		runEventLoop();
+		// unfortunately runEventLoop blocks, so this is last.
+		if (isWebMode) {
+			// hey look we're a web node!
+			
+			// add public directory for static content
+			getURLRouter().get("*", serveStaticFiles("./public/",));
+			
+			// There was dependency problems with having this inside config.
+			// As pretty much everything used config at some stage.
+			// Basically module ctors/dtors had cyclic dependencies. Moving here fixed that.
+			// Blame Session storage.
+			HTTPServerSettings settings = new HTTPServerSettings();
+			settings.port = configuration.bind.port;
+			settings.bindAddresses = cast(string[])configuration.bind.ip;
+			settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
+			settings.sessionStore = new DbSessionStore;
+			
+			if (configuration.bind.ssl.cert != "" && configuration.bind.ssl.key != "")
+				settings.sslContext = new SSLContext(configuration.bind.ssl.cert, configuration.bind.ssl.key);
+			
+			listenHTTP(settings, getURLRouter());
+			runEventLoop();
+		}
 	} catch (Exception e){ 
 		// log this
 		if (configuration !is null)
