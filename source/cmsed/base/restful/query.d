@@ -1,5 +1,5 @@
-module cmsed.base.internal.generators.restful.query;
-import cmsed.base.internal.generators.restful.defs;
+module cmsed.base.restful.query;
+import cmsed.base.restful.defs;
 import cmsed.base.routing;
 import vibe.data.json;
 import dvorm;
@@ -13,7 +13,7 @@ pure string queryRestfulData(TYPE)() {
 	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
-#line 1 \"cmsed.base.internal.generators.restful.query." ~ TYPE.stringof ~ "\"
+#line 1 \"cmsed.base.restful.query." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "\")
 void handleRestfulData" ~ TYPE.stringof ~ "Query() {
     import " ~ moduleName!TYPE ~ ";

@@ -1,5 +1,5 @@
-module cmsed.base.internal.generators.restful.modify;
-import cmsed.base.internal.generators.restful.defs;
+module cmsed.base.restful.modify;
+import cmsed.base.restful.defs;
 import cmsed.base.routing;
 import vibe.data.json;
 import dvorm;
@@ -13,7 +13,7 @@ pure string modifyRestfulData(TYPE)() {
 	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
-#line 1 \"cmsed.base.internal.generators.restful.modify." ~ TYPE.stringof ~ "\"
+#line 1 \"cmsed.base.restful.modify." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "/:key\")
 void handleRestfulData" ~ TYPE.stringof ~ "Modify() {
     import " ~ moduleName!TYPE ~ ";
