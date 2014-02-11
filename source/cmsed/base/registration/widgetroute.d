@@ -1,5 +1,5 @@
 module cmsed.base.registration.widgetroute;
-import cmsed.base.routing : RouteInformation;
+import cmsed.base.internal.routing : RouteInformation;
 import cmsed.base.config : configuration;
 import std.file : write, append;
 import std.path : buildPath;

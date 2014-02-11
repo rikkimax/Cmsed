@@ -1,5 +1,5 @@
 module cmsed.base.internal.registration.staticfiles;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 import cmsed.base.mimetypes;
 import vibe.d;
 import std.path : extension;
@@ -47,16 +47,20 @@ void setStaticFilePath(string name) {
 
 void configureStaticFiles() {
 	synchronized {
-		void staticHandler(HTTPServerRequest req, HTTPServerResponse res) {
-			enforce(req.path.length > staticPath.length, "Umm how did this happen?");
-			string path = req.path[staticPath.length .. $].toLower();
+		void staticHandler() {
+			string path = http_request.path[staticPath.length .. $].toLower();
 			
 			if (path in staticFiles) {
-				res.writeBody(cast(ubyte[])staticFiles[path], staticTypes[path]);
+				http_response.writeBody(cast(ubyte[])staticFiles[path], staticTypes[path]);
 			}
 		}
 		
-		getURLRouter().match(HTTPMethod.GET, staticPath ~ "/*", &staticHandler);
+		bool func() {
+			return http_request.path.length > staticPath.length && http_request.path[0 .. staticPath.length] == staticPath;
+		}
+		
+		auto info = new RouteInformation(RouteType.Get, null, null, "staticHandler", staticPath);
+		getURLRouter().register(info, &func, &staticHandler);
 		
 		// logging
 		

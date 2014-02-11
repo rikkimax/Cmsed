@@ -1,7 +1,7 @@
 module cmsed.base.registration.widget;
 import cmsed.base.models.widgetusage;
 import cmsed.base.caches.widgetusage;
-import cmsed.base.routing;
+import cmsed.base.internal.routing.defs;
 public import std.functional : toDelegate;
 
 /**

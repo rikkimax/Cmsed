@@ -1,7 +1,6 @@
 module cmsed.test.routes.test;
-import cmsed.base.routing;
-import cmsed.base.restful;
-import cmsed.test.models.book;
+import cmsed.base;
+import cmsed.test.models;
 
 class Test : OORoute {
 	@RouteGroup(null, "/.svc") {

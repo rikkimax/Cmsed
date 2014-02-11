@@ -1,5 +1,5 @@
 module cmsed.base.main;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 import cmsed.base.config;
 import cmsed.base.registration;
 import cmsed.base.sessionstorage;
@@ -155,8 +155,16 @@ bool runIteration(bool isInstall) {
 		if (isWebMode) {
 			// hey look we're a web node!
 			
+			bool trueFunc() {
+				return true;
+			}
+			
+			void serveFunc() {
+				serveStaticFiles("./public/")(http_request, http_response);
+			}
+			
 			// add public directory for static content
-			getURLRouter().get("*", serveStaticFiles("./public/",));
+			getURLRouter().register(new RouteInformation(RouteType.Get), &trueFunc, &serveFunc);
 			
 			// There was dependency problems with having this inside config.
 			// As pretty much everything used config at some stage.

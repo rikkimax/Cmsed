@@ -1,7 +1,7 @@
 module cmsed.base.registration.routes;
 import cmsed.base.registration.widgetroute;
 import cmsed.base.config;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 import std.file : write;
 
 /**
@@ -18,19 +18,14 @@ private shared {
 /**
  * Registers a route class to be listend for when in production mode.
  */
-void registerRoute(C : OORoute)() {
+void registerRoute(C)() {
 	synchronized {
-		configureRouteFuncs ~= &registerRouteHandler!C;
-	}
-}
-
-/**
- * Registers a route class to be listend for when in install mode.
- * Allows for having an installer.
- */
-void registerRoute(C : OOInstallRoute)() {
-	synchronized {
-		configureInstallRouteFuncs ~= &registerRouteHandler!C;
+		static if (is(C : OORoute) || is(C : OOAnyRoute)) {
+			configureRouteFuncs ~= &registerRouteHandler!C;
+		}
+		static if (is(C : OOInstallRoute) || is(C : OOAnyRoute)) {
+			configureInstallRouteFuncs ~= &registerRouteHandler!C;
+		}
 	}
 }
 

@@ -1,5 +1,5 @@
 module cmsed.base.config;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 import dvorm.connection;
 import vibe.data.json;
 import vibe.stream.ssl;
@@ -84,7 +84,10 @@ class Logging {
 		string dir = "logs";
 		string routeFile = "route.log";
 		string ormFile = "orm.log";
+		
 		string accessFile = "access.log";
+		string errorAccessFile = "access_error.log";
+		
 		string errorFile = "error.log";
 		string widgetsFile = "widgets.log";
 	}

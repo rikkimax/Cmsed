@@ -1,5 +1,5 @@
 module cmsed.base.filters;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 
 /**
  * Checks to make sure the session has already been started.

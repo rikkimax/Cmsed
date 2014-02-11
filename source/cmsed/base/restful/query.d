@@ -1,6 +1,6 @@
 module cmsed.base.restful.query;
 import cmsed.base.restful.defs;
-import cmsed.base.routing;
+import cmsed.base.internal.routing;
 import vibe.data.json;
 import dvorm;
 import std.traits : moduleName;
