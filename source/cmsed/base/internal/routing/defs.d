@@ -3,7 +3,8 @@ import cmsed.base.config : configuration;
 import cmsed.base.internal.routing.parser;
 public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod;
 
-import std.string : toLower, split;
+import std.string : toLower;
+import cmsed.base.util : split;
 import std.file : append;
 import std.path : buildPath;
 import std.conv : to;
@@ -164,7 +165,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			bool hit = false;
 			
 			foreach	(k, v; routes) {
-				if (v.check !is null && v.check()) {
+				if (v.check is null || (v.check !is null && v.check())) {
 					currentRoute = cast(RouteInformation)k;
 					v.route();
 					
@@ -210,24 +211,6 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 	void register(RouteInformation info, bool delegate() check, void delegate() route) {
 		synchronized {
 			routes[info] = RouteInternalState(check, route);
-		}
-	}
-	
-	void register(RouteInformation info, bool delegate() check, void function() route) {
-		synchronized {
-			routes[info] = RouteInternalState(check, toDelegate(route));
-		}
-	}
-	
-	void register(RouteInformation info, bool function() check, void function() route) {
-		synchronized {
-			routes[info] = RouteInternalState(toDelegate(check), toDelegate(route));
-		}
-	}
-	
-	void register(RouteInformation info, bool function() check, void delegate() route) {
-		synchronized {
-			routes[info] = RouteInternalState(toDelegate(check), route);
 		}
 	}
 	

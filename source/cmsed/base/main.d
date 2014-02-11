@@ -155,16 +155,12 @@ bool runIteration(bool isInstall) {
 		if (isWebMode) {
 			// hey look we're a web node!
 			
-			bool trueFunc() {
-				return true;
-			}
-			
 			void serveFunc() {
 				serveStaticFiles("./public/")(http_request, http_response);
 			}
 			
 			// add public directory for static content
-			getURLRouter().register(new RouteInformation(RouteType.Get), &trueFunc, &serveFunc);
+			getURLRouter().register(new RouteInformation(RouteType.Get), null, &serveFunc);
 			
 			// There was dependency problems with having this inside config.
 			// As pretty much everything used config at some stage.

@@ -1,6 +1,6 @@
 module cmsed.base.internal.routing.checks;
 import cmsed.base.internal.routing.defs;
-import std.string : split;
+import cmsed.base.util : split;
 import std.conv : to;
 
 pure RouteType getRouteTypeFromMethod(C, string f)() {
@@ -151,6 +151,7 @@ pure string handleCheckofRoute(RouteType type, string path)() {
 	if (path.length > 1) {
 		string[] strSplit = path[1 .. $].split("/");
 		ret ~= "    if (pathSplit.length >= " ~ to!string(strSplit.length) ~ ") {\n";
+		
 	F1: foreach(i, s; strSplit) {
 			if (s.length > 0) {
 				string iStr = to!string(i);
@@ -172,14 +173,15 @@ pure string handleCheckofRoute(RouteType type, string path)() {
 			
 			prevLength += s.length;
 		}
+		
+		ret ~= "    } else {\n";
+		ret ~= "        return false;\n";
+		ret ~= "    }\n";
 	}
 	
-	ret ~= "    } else {\n";
-	ret ~= "        return false;\n";
-	ret ~= "    }";
 	ret ~= "} else {\n";
 	ret ~= "    return false;\n";
-	ret ~= "}";
+	ret ~= "}\n";
 	
 	return ret;
 }

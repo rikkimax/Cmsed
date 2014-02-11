@@ -122,7 +122,7 @@ pure dstring replace(dstring text, dstring oldText, dstring newText, bool caseSe
  * Split a string up
  */
 
-string[] split(string text, string delimater) {
+pure string[] split(string text, string delimater) {
 	string[] ret;
 	ptrdiff_t i;
 	while((i = text.indexOf(delimater)) >= 0) {
