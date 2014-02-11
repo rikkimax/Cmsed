@@ -223,7 +223,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 	@property {
 		shared(RouteInformation[]) allRouteInformation() {
 			synchronized {
-				return routes.keys;
+				return cast(shared)routes.keys;
 			}
 		}
 		
