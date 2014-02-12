@@ -10,8 +10,6 @@ import std.path : buildPath;
 import std.conv : to;
 import std.functional : toDelegate;
 
-import core.sync.rwmutex;
-
 /**
  * Below is a per thread variable which is set upon hitting the function wrapper.
  * It contains the current function, class, module, path and type of route being utilised.
@@ -139,114 +137,99 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		}
 		
 		RouteInternalState[RouteInformation] routes;
-		__gshared ReadWriteMutex rwMutex;
-	}
-	
-	this() {
-		rwMutex = new ReadWriteMutex(ReadWriteMutex.Policy.PREFER_READERS);
 	}
 	
 	void handleRequest(HTTPServerRequest req, HTTPServerResponse res) {
-		synchronized (rwMutex.reader) {
-			http_request = req;
-			http_response = res;
-			
-			if ("X-HTTP-Method-Override" in req.headers) {
-				switch(req.headers["X-HTTP-Method-Override"].toLower()) {
-					case "get":
-						http_request.method = HTTPMethod.GET;
-						break;
-					case "post":
-						http_request.method = HTTPMethod.POST;
-						break;
-					case "put":
-						http_request.method = HTTPMethod.PUT;
-						break;
-					case "delete":
-						http_request.method = HTTPMethod.DELETE;
-						break;
-					default:
-						res.statusCode = HTTPStatus.badRequest;
-						res.writeVoidBody();
-						return;
+		http_request = req;
+		http_response = res;
+		
+		if ("X-HTTP-Method-Override" in req.headers) {
+			switch(req.headers["X-HTTP-Method-Override"].toLower()) {
+				case "get":
+					http_request.method = HTTPMethod.GET;
+					break;
+				case "post":
+					http_request.method = HTTPMethod.POST;
+					break;
+				case "put":
+					http_request.method = HTTPMethod.PUT;
+					break;
+				case "delete":
+					http_request.method = HTTPMethod.DELETE;
+					break;
+				default:
+					res.statusCode = HTTPStatus.badRequest;
+					res.writeVoidBody();
+					return;
+			}
+		}
+		
+		bool hit = false;
+		
+		foreach	(k, v; routes) {
+			if (v.check is null || (v.check !is null && v.check())) {
+				currentRoute = cast(RouteInformation)k;
+				v.route();
+				
+				if (http_response.headerWritten) {
+					// we succedded in the request
+					hit = true;
+					// now its time to break
+					break;
+				} else {
+					// we failed in our request
+					// try again
+					// or we didn't write any headers
+					// (just in case another route is listening on this exact path / http type)
 				}
 			}
+		}
+		
+		if (!hit) {
+			// error 404
+			res.statusCode = HTTPStatus.notFound;
+		}
+		
+		if (!http_response.headerWritten) {
+			// TODO: we had an error, handle it!
+			// if headers are already written we can't exactly rewrite them. Oh well.
 			
-			bool hit = false;
+			// for temporary usage
+			res.writeBody("");
 			
-			foreach	(k, v; routes) {
-				if (v.check is null || (v.check !is null && v.check())) {
-					currentRoute = cast(RouteInformation)k;
-					v.route();
-					
-					if (http_response.headerWritten) {
-						// we succedded in the request
-						hit = true;
-						// now its time to break
-						break;
-					} else {
-						// we failed in our request
-						// try again
-						// or we didn't write any headers
-						// (just in case another route is listening on this exact path / http type)
-					}
-				}
-			}
-			
-			if (!hit) {
-				// error 404
-				res.statusCode = HTTPStatus.notFound;
-			}
-			
-			if (!http_response.headerWritten) {
-				// TODO: we had an error, handle it!
-				// if headers are already written we can't exactly rewrite them. Oh well.
-				
-				// for temporary usage
-				res.writeBody("");
-				
-				string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
-				if (http_request.method == HTTPMethod.GET)
-					append(oFile, "get:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-				else if (http_request.method == HTTPMethod.POST)
-					append(oFile, "post:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-				else if (http_request.method == HTTPMethod.PUT)
-					append(oFile, "put:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-				else if (http_request.method == HTTPMethod.DELETE)
-					append(oFile, "delete:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-			}
+			string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
+			if (http_request.method == HTTPMethod.GET)
+				append(oFile, "get:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+			else if (http_request.method == HTTPMethod.POST)
+				append(oFile, "post:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+			else if (http_request.method == HTTPMethod.PUT)
+				append(oFile, "put:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+			else if (http_request.method == HTTPMethod.DELETE)
+				append(oFile, "delete:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
 		}
 	}
 	
 	void register(RouteInformation info, bool delegate() check, void delegate() route) {
-		synchronized (rwMutex.writer) {
-			routes[info] = RouteInternalState(check, route);
-		}
+		routes[info] = RouteInternalState(check, route);
 	}
 	
 	void unregister(RouteInformation info) {
-		synchronized (rwMutex.writer) {
-			routes.remove(info);
-		}
+		routes.remove(info);
 	}
 	
 	@property {
 		shared(RouteInformation[]) allRouteInformation() {
-			synchronized (rwMutex.reader) {
-				return cast(shared)routes.keys;
-			}
+			return cast(shared)routes.keys;
 		}
 		
 		shared(RouteInformation[]) allRouteInformationByClass(string name) {
-			synchronized (rwMutex.reader) {
-				RouteInformation[] ret;
-				foreach(ri; routes.keys) {
-					if (ri.className == name) {
-						ret ~= ri;
-					}
+			RouteInformation[] ret;
+			foreach(ri; routes.keys) {
+				if (ri.className == name) {
+					ret ~= ri;
 				}
-				return cast(shared)ret;
 			}
+			return cast(shared)ret;
 		}
 	}
 }
