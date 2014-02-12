@@ -76,7 +76,7 @@ bool delegate() getCheckFuncOfRoute(RouteType type, string path)() {
 /**
  * Creates a delegate specifically for checking if a route is current
  */
-void delegate() getFuncOfRoute(T, string m)() {
+pure void delegate() getFuncOfRoute(T, string m)() {
 	void func() {
 		T t = new T;
 		static if (useRenderOptionalFunc!(T, m)) {
@@ -95,7 +95,7 @@ void delegate() getFuncOfRoute(T, string m)() {
 /**
  * Upon adding a template for a specific route execute it, this is used for e.g. getting all widgets
  */
-void handleFirstExecute(T, string f)() {
+pure void handleFirstExecute(T, string f)() {
 	enum isFirstExecute = true;
 	auto currentRoute = RouteInformation(getRouteTypeFromMethod!(T, f)(), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)());
 	compileDietFile!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute)(new MemoryOutputStream());

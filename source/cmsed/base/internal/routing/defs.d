@@ -10,6 +10,8 @@ import std.path : buildPath;
 import std.conv : to;
 import std.functional : toDelegate;
 
+import core.sync.rwmutex;
+
 /**
  * Below is a per thread variable which is set upon hitting the function wrapper.
  * It contains the current function, class, module, path and type of route being utilised.
@@ -113,7 +115,11 @@ interface OOInstallRoute {}
 interface OOAnyRoute {}
 
 private {
-	__gshared CTFEURLRouter urlRouter_ = new CTFEURLRouter;
+	__gshared CTFEURLRouter urlRouter_;
+	
+	static this() {
+		urlRouter_ = new CTFEURLRouter();
+	}
 }
 
 CTFEURLRouter getURLRouter() {
@@ -132,17 +138,21 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			void delegate() route;
 		}
 		
-		RouteInternalState[RouteInformation] routes;		
+		RouteInternalState[RouteInformation] routes;
+		__gshared ReadWriteMutex rwMutex;
+	}
+	
+	this() {
+		rwMutex = new ReadWriteMutex(ReadWriteMutex.Policy.PREFER_READERS);
 	}
 	
 	void handleRequest(HTTPServerRequest req, HTTPServerResponse res) {
-		synchronized {
+		synchronized (rwMutex.reader) {
 			http_request = req;
 			http_response = res;
 			
-			auto tempVal = req.headers.get("X-HTTP-Method-Override", null);
-			if (tempVal !is null) {
-				switch(tempVal.toLower()) {
+			if ("X-HTTP-Method-Override" in req.headers) {
+				switch(req.headers["X-HTTP-Method-Override"].toLower()) {
 					case "get":
 						http_request.method = HTTPMethod.GET;
 						break;
@@ -188,7 +198,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 				res.statusCode = HTTPStatus.notFound;
 			}
 			
-			if (res.statusCode != HTTPStatus.ok && !http_response.headerWritten) {
+			if (!http_response.headerWritten) {
 				// TODO: we had an error, handle it!
 				// if headers are already written we can't exactly rewrite them. Oh well.
 				
@@ -209,26 +219,26 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 	}
 	
 	void register(RouteInformation info, bool delegate() check, void delegate() route) {
-		synchronized {
+		synchronized (rwMutex.writer) {
 			routes[info] = RouteInternalState(check, route);
 		}
 	}
 	
 	void unregister(RouteInformation info) {
-		synchronized {
+		synchronized (rwMutex.writer) {
 			routes.remove(info);
 		}
 	}
 	
 	@property {
 		shared(RouteInformation[]) allRouteInformation() {
-			synchronized {
+			synchronized (rwMutex.reader) {
 				return cast(shared)routes.keys;
 			}
 		}
 		
 		shared(RouteInformation[]) allRouteInformationByClass(string name) {
-			synchronized {
+			synchronized (rwMutex.reader) {
 				RouteInformation[] ret;
 				foreach(ri; routes.keys) {
 					if (ri.className == name) {
