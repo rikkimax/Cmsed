@@ -1,6 +1,7 @@
 module cmsed.base.config;
 import cmsed.base.internal.routing;
 import dvorm.connection;
+import dvorm.email.config;
 import vibe.data.json;
 import vibe.stream.ssl;
 import std.file : read, exists, isFile, mkdirRecurse, timeLastModified;
@@ -25,6 +26,8 @@ class Configuration {
 		BindNodeCommunicationData bindNodeCoummunication = new BindNodeCommunicationData;
 		
 		Logging logging = new Logging;
+		
+		EmailServer email = new EmailServer;
 	}
 }
 
@@ -90,6 +93,55 @@ class Logging {
 		
 		string errorFile = "error.log";
 		string widgetsFile = "widgets.log";
+	}
+}
+
+class EmailServer {
+	@optional {
+		EmailReceiveServer receive;
+		EmailSenderServer send;
+	}
+}
+
+enum EmailReceiveServerType : string {
+	Pop3 = "pop3"
+}
+
+struct EmailReceiveServer {
+	EmailReceiveServerType type;
+	bool secure = false;
+	
+	string host;
+	@optional {
+		ushort port;
+	}
+	
+	@optional {
+		string user;
+		string password;
+	}
+}
+
+enum EmailSendServerType : string {
+	SMTP = "smtp"
+}
+
+struct EmailSenderServer {
+	EmailSendServerType type;
+	bool secure = false;
+	
+	string host;
+	@optional {
+		ushort port;
+	}
+	
+	@optional {
+		string user;
+		string password;
+	}
+	
+	@optional {
+		string defaultFrom;
 	}
 }
 
