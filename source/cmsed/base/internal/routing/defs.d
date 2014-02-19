@@ -108,6 +108,10 @@ struct RouteTemplate {
 	string templateName;
 }
 
+struct RouteErrorHandler {
+	int error;
+}
+
 interface OORoute {}
 interface OOInstallRoute {}
 interface OOAnyRoute {}
@@ -137,6 +141,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		}
 		
 		RouteInternalState[RouteInformation] routes;
+		RouteInternalState[RouteInformation][int] errorRoutes;
 	}
 	
 	void handleRequest(HTTPServerRequest req, HTTPServerResponse res) {
@@ -164,8 +169,6 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			}
 		}
 		
-		bool hit = false;
-		
 		foreach	(k, v; routes) {
 			if (v.check is null || (v.check !is null && v.check())) {
 				currentRoute = cast(RouteInformation)k;
@@ -173,9 +176,8 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 				
 				if (http_response.headerWritten) {
 					// we succedded in the request
-					hit = true;
-					// now its time to break
-					break;
+					// now its time to stop
+					return;
 				} else {
 					// we failed in our request
 					// try again
@@ -185,28 +187,82 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			}
 		}
 		
-		if (!hit) {
-			// error 404
-			res.statusCode = HTTPStatus.notFound;
+		bool runErrorRouteFunc() {
+			if (res.statusCode in errorRoutes) {
+				// basically this current status code (from the above set of routes or notFound)
+				// is in the errorRoutes list.
+				// to handle this we run the checks like a normal route and execute
+				// allows for a much more advanced form of control i.e. on a specific path!
+				
+				// however the below code is only for IF there is route info
+				foreach	(k, v; errorRoutes[res.statusCode]) {
+					if (k !is null && (v.check !is null && v.check())) {
+						currentRoute = cast(RouteInformation)k;
+						v.route();
+						
+						if (http_response.headerWritten) {
+							// we succedded in the request
+							// now its time to stop
+							return true;
+						} else {
+							// we failed in our request
+							// try again
+							// or we didn't write any headers
+							// (just in case another route is listening on this exact path / http type)
+						}
+					}
+				}
+				
+				// however if there wasn't there,
+				// then lets use null if its there.
+				
+				if (null in errorRoutes[res.statusCode]) {
+					auto iData = errorRoutes[res.statusCode][null];
+					
+					currentRoute = null;
+					iData.route();
+					
+					if (http_response.headerWritten) {
+						// we succedded in the request
+						// now its time to stop
+						return true;
+					} else {
+						// oh dammit
+						// next fail through :(
+					}
+				}
+			}
+			
+			return false;
 		}
 		
-		if (!http_response.headerWritten) {
-			// TODO: we had an error, handle it!
-			// if headers are already written we can't exactly rewrite them. Oh well.
-			
-			// for temporary usage
-			res.writeBody("");
-			
-			string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
-			if (http_request.method == HTTPMethod.GET)
-				append(oFile, "get:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-			else if (http_request.method == HTTPMethod.POST)
-				append(oFile, "post:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-			else if (http_request.method == HTTPMethod.PUT)
-				append(oFile, "put:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-			else if (http_request.method == HTTPMethod.DELETE)
-				append(oFile, "delete:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
-		}
+		// if we've reached this point then we just don't have the requested route.
+		// so now we'll work from our error handling code
+		
+		// error 404
+		if (res.statusCode == HTTPStatus.ok)
+			res.statusCode = HTTPStatus.notFound;
+		if (runErrorRouteFunc()) return;
+		
+		res.statusCode = HTTPStatus.internalServerError;
+		if (runErrorRouteFunc()) return;
+		
+		// we hit an error we didn't know how to handle in ANY FORM
+		// Log it to file.
+		// output nothing to client.
+		// Make sure they know something bad happend.
+		
+		res.writeVoidBody();
+		
+		string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
+		if (http_request.method == HTTPMethod.GET)
+			append(oFile, "get:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+		else if (http_request.method == HTTPMethod.POST)
+			append(oFile, "post:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+		else if (http_request.method == HTTPMethod.PUT)
+			append(oFile, "put:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
+		else if (http_request.method == HTTPMethod.DELETE)
+			append(oFile, "delete:" ~ http_request.path ~ "?" ~ http_request.queryString ~ "\n");
 	}
 	
 	void register(RouteInformation info, bool delegate() check, void delegate() route) {
@@ -215,6 +271,27 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 	
 	void unregister(RouteInformation info) {
 		routes.remove(info);
+	}
+	
+	/**
+	 * Registers an error route.
+	 * 
+	 * Params:
+	 * 		error	= 	The error to handle
+	 * 		info	=	The route information. If null is a global error handler.
+	 * 		check	= 	The check to perform if should use this error handler
+	 * 		route	= 	The actual error route handler.
+	 */
+	void register(int error, RouteInformation info, bool delegate() check, void delegate() route) {
+		if (info.path == "")
+			errorRoutes[error][null] = RouteInternalState(check, route);
+		else
+			errorRoutes[error][info] = RouteInternalState(check, route);
+	}
+	
+	void unregister(int error, RouteInformation info) {
+		if (error in errorRoutes)
+			errorRoutes[error].remove(info);
 	}
 	
 	@property {

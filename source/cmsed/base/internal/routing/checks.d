@@ -106,6 +106,30 @@ pure bool isRoute(C, string f)() {
 	return false;
 }
 
+pure bool isErrorRoute(C, string f)() {
+	C c = new C;
+	
+	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+		static if (__traits(compiles, {RouteErrorHandler rf = UDA; } )) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+pure int getErrorRouteError(C, string f)() {
+	C c = new C;
+	
+	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+		static if (__traits(compiles, {RouteErrorHandler rf = UDA; } )) {
+			return rf.error;
+		}
+	}
+	
+	return 0;
+}
+
 /**
  * Does the given class have either, OORoute/OOInstallRoute or OOAnyRoute on it?
  */

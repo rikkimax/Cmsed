@@ -25,8 +25,13 @@ void registerRouteHandler(T)() if (isARouteClass!T()) {
 				handleFirstExecute!(T, f);
 			}
 			
-			getURLRouter().register(new RouteInformation(getRouteTypeFromMethod!(T, f), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)),
-			                        getCheckFuncOfRoute!(T, f), getFuncOfRoute!(T, f));
+			static if (isErrorRoute!(T, f)) {
+				getURLRouter().register(getErrorRouteError!(T, f), new RouteInformation(getRouteTypeFromMethod!(T, f), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)),
+				                        getCheckFuncOfRoute!(T, f), getFuncOfRoute!(T, f));
+			} else {
+				getURLRouter().register(new RouteInformation(getRouteTypeFromMethod!(T, f), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)),
+				                        getCheckFuncOfRoute!(T, f), getFuncOfRoute!(T, f));
+			}
 			
 			routeOutput ~= getRouteTypeFromMethod!(T, f)() ~ ":" ~ T.stringof ~ "." ~ f ~ ":" ~ getPathFromMethod!(T, f)() ~ "\n";
 		}
