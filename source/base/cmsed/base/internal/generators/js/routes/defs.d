@@ -1,5 +1,5 @@
 module cmsed.base.internal.generators.js.routes.defs;
-//import cmsed.base.internal.generators.js.routes.generate;
+import cmsed.base.internal.generators.js.routes.generate;
 import cmsed.base.internal.generators.js.defs;
 import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.registration.onload;
@@ -14,6 +14,10 @@ struct GenerateData {
 
 struct shouldNotGenerateJavascriptRoute {}
 struct ignoreGenerateJavascriptRoute {}
+
+struct jsRouteName {
+	string name;
+}
 
 /**
  * Properties
@@ -68,13 +72,13 @@ void pathOfRestfulRoute(string path) {
  * 		ajaxProtection = 	The restful protection to work with for generation
  * 		overrideChecks = 	Forces the generation of this model. Meant for manual generation
  */
-void generateJavascriptModel(T, ushort ajaxProtection = RestfulProtection.All, bool overrideChecks = false)() {
+void generateJavascriptRoute(T, bool overrideChecks = false)() {
 	synchronized {
 		static if (overrideChecks) {
-			bindingFuncs[getTableName!T] = toDelegate(cast(shared)&(generateJsFunc!(T, ajaxProtection)));
-		} else static if (shouldGenerateJavascriptModel!T) {
+			bindingFuncs[getJSRouteName!T] = toDelegate(cast(shared)&(generateJsFunc!(T)));
+		} else static if (shouldGenerateJavascriptRoute!T) {
 			if (!disableGeneration) {
-				bindingFuncs[getTableName!T] = toDelegate(cast(shared)&(generateJsFunc!(T, ajaxProtection)));
+				bindingFuncs[getJSRouteName!T] = toDelegate(cast(shared)&(generateJsFunc!(T)));
 			}
 		}
 	}
@@ -103,6 +107,16 @@ pure bool shouldIgnoreGenerateJavascriptRoute(T, string m)() {
 	} else {
 		return true;
 	}
+}
+
+pure string getJSRouteName(C)() {
+	foreach(UDA; __traits(getAttributes, C)) {
+		static if (__traits(compiles, {jsRouteName rf = UDA; } )) {
+			return UDA.name;
+		}
+	}
+	
+	return C.stringof;
 }
 
 shared static this() {

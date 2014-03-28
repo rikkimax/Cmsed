@@ -2,6 +2,7 @@ module cmsed.test.routes.test;
 import cmsed.base;
 import cmsed.test.models;
 
+@jsRouteName("test_route")
 class Test : OORoute {
 	@RouteFunction(RouteType.Get, "/")
 	void index() {
