@@ -2,6 +2,7 @@ module cmsed.user.models.user;
 import cmsed.user.models.group;
 import cmsed.user.models.usergroup;
 import cmsed.base.util;
+import cmsed.base.defs;
 import dvorm;
 import vbson = vibe.data.bson;
 import std.string : split;

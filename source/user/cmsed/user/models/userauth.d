@@ -1,6 +1,7 @@
 module cmsed.user.models.userauth;
 public import cmsed.user.models.user : UserModel, UserIdModel;
 import cmsed.base.util;
+import cmsed.base.defs;
 import dvorm;
 import vbson = vibe.data.bson;
 import std.digest.ripemd;

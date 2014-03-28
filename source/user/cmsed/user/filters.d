@@ -1,5 +1,5 @@
 module cmsed.user.filters;
-import cmsed.base.routing;
+import cmsed.base.defs;
 import cmsed.base.filters;
 import cmsed.user.operations;
 import vibe.http.session;

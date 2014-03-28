@@ -4,6 +4,7 @@ module cmsed.base;
  * Publically imports all modules under cmsed.base
  */
 
+public import cmsed.base.defs;
 public import cmsed.base.main;
 public import cmsed.base.config;
 public import cmsed.base.sessionstorage;
@@ -36,8 +37,3 @@ public import cmsed.base.mimetypes;
 public import cmsed.base.models;
 public import cmsed.base.registration;
 public import cmsed.base.caches;
-
-/**
- * Internal api's that have definitions required by public api
- */
-public import cmsed.base.internal.routing.defs;

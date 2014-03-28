@@ -1,4 +1,4 @@
-module cmsed.base.browser_detection;
+module browser_detection;
 class BrowserInfo {
     string userAgent;
     

@@ -3,7 +3,7 @@ import cmsed.user.models.user;
 import cmsed.user.models.userauth;
 import cmsed.user.models.usergroup;
 import cmsed.user.registration.auth;
-import cmsed.base.routing;
+import cmsed.base.defs;
 
 /**
  * Get the currently logged in user.

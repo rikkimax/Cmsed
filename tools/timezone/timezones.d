@@ -1,4 +1,4 @@
-module cmsed.base.timezones;
+module timezones;
 import std.datetime;
 
 enum TimeZones {

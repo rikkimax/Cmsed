@@ -12,7 +12,13 @@
     "subPackages": [
 		{
 			"name": "base",
-			"sourcePaths": ["source/cmsed/base"],
+			"sourcePaths": ["source/base/cmsed"],
+			"importPaths": [
+				"source/base",
+				"tools/mime",
+				"tools/timezone",
+				"tools/browser_detection"
+			],
 			"sourceFiles": [
 				"tools/timezone/timezones.d",
 				"tools/browser_detection/browser_detection.d",
@@ -24,21 +30,23 @@
 				"tools/mime",
 				"libraries/js"
 			],
+			"mainSourceFile": "source/base/cmsed/base/main.d",
 			"targetType": "library",
 			"targetPath": "bin/base",
 			"versions": ["VibeCustomMain"],
 			"dependencies": {
 				"vibe-d": "~master",
-				"dvorm": "~master"
+				"dvorm": "~master",
+				"dvorm:email": "~master"
 			}
 		},
 		{
-			"name": "rebuildTools",
+			"name": "rebuildtools",
 			"targetType": "staticLibrary",
 			"preGenerateCommands": [
-				"cd tools/timezone && rdmd generator cmsed.base.timezones",
-				"cd tools/browser_detection && rdmd generator cmsed.base.browser_detection",
-				"cd tools/mime && rdmd generator cmsed.base.mimetypes"
+				"cd tools/timezone && rdmd generator timezones",
+				"cd tools/browser_detection && rdmd generator browser_detection",
+				"cd tools/mime && rdmd generator mimetypes"
 			],
 			"sourceFiles": [
 				"tools/main.d",
@@ -47,7 +55,8 @@
 		},
 		{
 			"name": "user",
-			"sourcePaths": ["source/cmsed/user"],
+			"sourcePaths": ["source/user/cmsed"],
+			"importPaths": ["source/user"],
 			"targetType": "library",
 			"targetPath": "bin/user",
 			"dependencies": {
@@ -56,7 +65,8 @@
 		},
 		{
 			"name": "test",
-			"sourcePaths": ["source/cmsed/test"],
+			"sourcePaths": ["source/test/cmsed"],
+			"importPaths": ["source/test"],
 			"targetType": "executable",
 			"targetPath": "bin/test",
             "stringImportPaths": ["views/test"],

@@ -1,4 +1,4 @@
-module cmsed.base.mimetypes;
+module mimetypes;
 
 pure string getTemplateForType(string type) {
     foreach(i, mt; mimeTypes) {
