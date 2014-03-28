@@ -30,7 +30,7 @@ void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(r
                 onSaveOfObject(this_, event);
             },
             onFailure: function(event) {
-                onFailudata.retoSaveObject(this_, event);
+                onFailureToSaveObject(this_, event);
             }
         });
 """;
