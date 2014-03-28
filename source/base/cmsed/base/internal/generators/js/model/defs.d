@@ -2,7 +2,7 @@ module cmsed.base.internal.generators.js.model.defs;
 import cmsed.base.internal.generators.js.model.generate;
 import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.registration.onload;
-import cmsed.base.restful.defs;
+import cmsed.base.internal.restful.defs;
 import dvorm.util;
 import std.traits : isBasicType, isBoolean;
 import std.functional : toDelegate;

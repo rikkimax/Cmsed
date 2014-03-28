@@ -1,4 +1,4 @@
-module cmsed.base.models.session;
+module cmsed.base.internal.models.session;
 import cmsed.base.internal.generators.js.model.defs;
 import dvorm;
 

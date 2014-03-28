@@ -1,5 +1,5 @@
-module cmsed.base.sessionstorage;
-import cmsed.base.models.session;
+module cmsed.base.internal.sessionstorage;
+import cmsed.base.internal.models.session;
 import vibe.http.session;
 import vibe.db.mongo.mongo;
 import std.conv : to;

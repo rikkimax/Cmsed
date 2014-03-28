@@ -1,5 +1,5 @@
-module cmsed.base.restful.create;
-import cmsed.base.restful.defs;
+module cmsed.base.internal.restful.create;
+import cmsed.base.internal.restful.defs;
 import cmsed.base.internal.routing;
 import vibe.data.json;
 import dvorm;
@@ -13,7 +13,7 @@ pure string createRestfulData(TYPE)() {
 	TYPE type = newValueOfType!TYPE;
 	
 	ret ~= """
-#line 1 \"cmsed.base.restful.create." ~ TYPE.stringof ~ "\"
+#line 1 \"cmsed.base.internal.restful.create." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Put, \"/" ~ getTableName!TYPE ~ "\")
 void handleRestfulData" ~ TYPE.stringof ~ "Create() {
     import " ~ moduleName!TYPE ~ ";
