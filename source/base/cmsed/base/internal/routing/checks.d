@@ -172,36 +172,35 @@ pure string handleCheckofRoute(RouteType type, string path)() {
 	
 	size_t prevLength;
 	size_t countSplit;
-	if (path.length > 1) {
-		string[] strSplit = path[1 .. $].split("/");
-		ret ~= "    if (pathSplit.length >= " ~ to!string(strSplit.length) ~ ") {\n";
-		
-	F1: foreach(i, s; strSplit) {
-			if (s.length > 0) {
-				string iStr = to!string(i);
-				
-				switch(s[0]) {
-					case ':':
-						ret ~= "        params[\"" ~ s[1 .. $] ~ "\"] = pathSplit[" ~ iStr ~ "];\n";
-						countSplit++;
-						break;
-					case '*':
-						// we don't have to do anything here really.
-						break F1;
-					default:
-						ret ~= "        if (pathSplit[" ~ iStr ~ "] != \"" ~ s ~ "\") return false;\n";
-						countSplit++;
-						break;
-				}
-			}
+	
+	string[] strSplit = path[1 .. $].split("/");
+	ret ~= "    if (pathSplit.length == " ~ to!string(strSplit.length) ~ ") {\n";
+	
+F1: foreach(i, s; strSplit) {
+		if (s.length > 0) {
+			string iStr = to!string(i);
 			
-			prevLength += s.length;
+			switch(s[0]) {
+				case ':':
+					ret ~= "        params[\"" ~ s[1 .. $] ~ "\"] = pathSplit[" ~ iStr ~ "];\n";
+					countSplit++;
+					break;
+				case '*':
+					// we don't have to do anything here really.
+					break F1;
+				default:
+					ret ~= "        if (pathSplit[" ~ iStr ~ "] != \"" ~ s ~ "\") return false;\n";
+					countSplit++;
+					break;
+			}
 		}
 		
-		ret ~= "    } else {\n";
-		ret ~= "        return false;\n";
-		ret ~= "    }\n";
+		prevLength += s.length;
 	}
+	
+	ret ~= "    } else {\n";
+	ret ~= "        return false;\n";
+	ret ~= "    }\n";
 	
 	ret ~= "} else {\n";
 	ret ~= "    return false;\n";

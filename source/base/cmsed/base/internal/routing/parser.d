@@ -47,6 +47,8 @@ bool delegate() getCheckFuncOfRoute(T, string m)() {
 	bool func() {
 		string[string] params;
 		mixin("import " ~ moduleName!T ~ ";");
+		pragma(msg, T, ".", m);
+		pragma(msg, handleCheckofRoute!(getRouteTypeFromMethod!(T, m), getPathFromMethod!(T, m)));
 		mixin(handleCheckofRoute!(getRouteTypeFromMethod!(T, m), getPathFromMethod!(T, m)));
 		http_request.params = params;
 		
