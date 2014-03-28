@@ -58,7 +58,7 @@ void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(r
         method: \"GET\",
         asynchronous: false
     });
-    ret = ret.evalReponse();
+    ret = ret.responseJSON();
     return new " ~ getTableName!T ~ "(" ~ data.findOneSetArgs ~ ");\n""";
 	data.findOneSet ~= "};\n";
 }
