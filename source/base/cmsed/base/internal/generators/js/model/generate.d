@@ -2,6 +2,7 @@ module cmsed.base.internal.generators.js.model.generate;
 import cmsed.base.internal.generators.js.model.defs;
 import cmsed.base.internal.generators.js.model.jsface;
 import cmsed.base.internal.generators.js.model.prototype;
+import cmsed.base.internal.generators.js.defs;
 import dvorm.util;
 import std.traits : isBasicType, isBoolean;
 

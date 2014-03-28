@@ -1,5 +1,5 @@
-module cmsed.base.internal.generators.js.model.defs;
-import cmsed.base.internal.generators.js.model.generate;
+module cmsed.base.internal.generators.js.routes.defs;
+//import cmsed.base.internal.generators.js.routes.generate;
 import cmsed.base.internal.generators.js.defs;
 import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.registration.onload;
@@ -10,29 +10,17 @@ import std.functional : toDelegate;
 
 struct GenerateData {
 	string ret;
-	string constructorArgs;
-	string constructorSet;
-	string props;
-	
-	string saveprop;
-	string savepropParams;
-	
-	string removeprop;
-	
-	string findOneArgs;
-	string findOneSet;
-	string findOneSetArgs;
 }
 
-struct shouldNotGenerateJavascriptModel {}
-struct ignoreGenerateJavascriptModel {}
+struct shouldNotGenerateJavascriptRoute {}
+struct ignoreGenerateJavascriptRoute {}
 
 /**
  * Properties
  */
 
 protected shared {
-	string pathToOOPClasses = "/js/models/";
+	string pathToRouteClasses = "/js/routes/";
 	
 	alias string delegate() modelBindingGetFunc;
 	modelBindingGetFunc[string] bindingFuncs;
@@ -41,15 +29,15 @@ protected shared {
 	string pathToRestfulRoute = "/.svc/";
 }
 
-void pathOfOOPClasses(string path) {
+void pathOfRouteClasses(string path) {
 	synchronized {
-		pathToOOPClasses = path;
+		pathToRouteClasses = path;
 	}
 }
 
-void pathOfAjaxHandler(string path) {
+void pathOfLibraries(string path) {
 	synchronized {
-		pathToAjaxHandler = path;
+		pathToLibraries = path;
 	}
 }
 
@@ -92,22 +80,22 @@ void generateJavascriptModel(T, ushort ajaxProtection = RestfulProtection.All, b
 	}
 }
 
-pure bool shouldGenerateJavascriptModel(T)() {
+pure bool shouldGenerateJavascriptRoute(T)() {
 	foreach(UDA; __traits(getAttributes, T)) {
-		static if (is(UDA == shouldNotGenerateJavascriptModel)) {
+		static if (is(UDA == shouldNotGenerateJavascriptRoute)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-pure bool shouldIgnoreGenerateJavascriptModel(T, string m)() {
+pure bool shouldIgnoreGenerateJavascriptRoute(T, string m)() {
 	T c = newValueOfType!T;
 	
 	static if (__traits(compiles, __traits(getProtection, mixin("c." ~ m))) &&
 	           __traits(getProtection, mixin("c." ~ m)) == "public") {
 		foreach(UDA; __traits(getAttributes, mixin("c." ~ m))) {
-			static if (is(UDA : ignoreGenerateJavascriptModel)) {
+			static if (is(UDA : ignoreGenerateJavascriptRoute)) {
 				return true;
 			}
 		}
@@ -118,11 +106,11 @@ pure bool shouldIgnoreGenerateJavascriptModel(T, string m)() {
 }
 
 shared static this() {
-	void jsModel(bool isInstall) {
+	void jsRoutes(bool isInstall) {
 		foreach(name, value; bindingFuncs) {
-			registerStaticFile(pathToOOPClasses ~ name, value(), "javascript");
+			registerStaticFile(pathToRouteClasses ~ name, value(), "javascript");
 		}
 	}
 	
-	registerOnLoad(&jsModel);
+	registerOnLoad(&jsRoutes);
 }

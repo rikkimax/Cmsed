@@ -35,3 +35,10 @@ public import cmsed.base.mimetypes;
 public import cmsed.base.models;
 public import cmsed.base.registration;
 public import cmsed.base.caches;
+
+/**
+ * It seems the internal api needs to be imported. Humm bug in module constructors?
+ * I blame Soaryn (even though he doesn't even know about this repo).
+ */
+
+import cmsed.base.internal;
