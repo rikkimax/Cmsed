@@ -50,6 +50,8 @@ mixin template RestfulRoute(ushort protection, TYPES...) {
 	import dvorm.util;
 	import vibe.data.json;
 	import std.conv : to;
+	import cmsed.base.internal.generators.js.routes.defs;
+	
 	mixin(restAllCheck!(protection, TYPES));
 #line 50 "cmsed.base.internal.restful.defs"
 }

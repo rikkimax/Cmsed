@@ -15,6 +15,7 @@ pure string modifyRestfulData(TYPE)() {
 	ret ~= """
 #line 1 \"cmsed.base.internal.restful.modify." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "/:key\")
+@jsRouteParameters([" ~ valueOps!TYPE ~ "])
 void handleRestfulData" ~ TYPE.stringof ~ "Modify() {
     import " ~ moduleName!TYPE ~ ";
     auto value = " ~ TYPE.stringof ~ ".findOne(http_request.params[\"key\"]);
@@ -79,4 +80,30 @@ void handleRestfulData" ~ TYPE.stringof ~ "Modify() {
 """;
 	
 	return ret;
+}
+
+private {
+	pure string valueOps(T)() {
+		string ret;
+		foreach (m; __traits(allMembers, T)) {
+			static if (isUsable!(T, m)() && !shouldBeIgnored!(T, m)()) {
+				static if (is(typeof(__traits(getMember, T, m)) : Object)) {
+					
+					foreach (n; __traits(allMembers, typeof(__traits(getMember, T, m)))) {
+						static if (isUsable!(typeof(__traits(getMember, T, m)), n)) {
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "\", ";
+						}
+					}
+					
+				} else {
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "\", ";
+				}
+			}
+		}
+		
+		if (ret.length > 0)
+			ret.length -= 2;
+		
+		return ret;
+	}
 }

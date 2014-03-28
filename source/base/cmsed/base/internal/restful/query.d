@@ -15,6 +15,7 @@ pure string queryRestfulData(TYPE)() {
 	ret ~= """
 #line 1 \"cmsed.base.internal.restful.query." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "\")
+@jsRouteParameters([" ~ valueOps!TYPE ~ "\"__maxAmount\", \"__offset\"])
 void handleRestfulData" ~ TYPE.stringof ~ "Query() {
     import " ~ moduleName!TYPE ~ ";
     auto query = " ~ TYPE.stringof ~ ".query();
@@ -182,6 +183,39 @@ private {
 			
 			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_like\" in http_request.form)\n";
 			ret ~= "        query." ~ m ~ "_like(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_like\"]));\n";
+		}
+		
+		return ret;
+	}
+	
+	pure string valueOps(T)() {
+		string ret;
+		foreach (m; __traits(allMembers, T)) {
+			static if (isUsable!(T, m)() && !shouldBeIgnored!(T, m)()) {
+				static if (is(typeof(__traits(getMember, T, m)) : Object)) {
+					
+					foreach (n; __traits(allMembers, typeof(__traits(getMember, T, m)))) {
+						static if (isUsable!(typeof(__traits(getMember, T, m)), n)) {
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_eq\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_neq\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_mt\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_lt\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_mte\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_lte\", ";
+							ret ~= "\"" ~ getNameValue!(T, m) ~ "_" ~ getNameValue!(typeof(__traits(getMember, T, m)), n) ~ "_like\", ";
+						}
+					}
+					
+				} else {
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_eq\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_neq\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_mt\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_lt\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_mte\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_lte\", ";
+					ret ~= "\"" ~ getNameValue!(T, m) ~ "_like\", ";
+				}
+			}
 		}
 		
 		return ret;

@@ -1,6 +1,6 @@
 module cmsed.base.internal.generators.js.routes.generate;
 import cmsed.base.internal.generators.js.routes.defs;
-//import cmsed.base.internal.generators.js.routes.prototype;
+import cmsed.base.internal.generators.js.routes.prototype;
 import cmsed.base.internal.generators.js.defs;
 import cmsed.base.internal.routing.checks;
 import dvorm.util;
@@ -23,19 +23,14 @@ string generateJsFunc(T)() {
 }
 
 
-/**
- * Creates a variable associated with a specific OOP handler in javascript.
- */
 string handleClassProperty(T, string m, // params
                            T t = newValueOfType!T // meta info that is needed but not available inside the function
                            )() {
-	string ret;
-	/*switch(ajaxHandler) {
-	 case AjaxHandler.Prototype:
-	 handleClassPropertyPrototype!(T, ajaxProtection, m)(data);
-	 break;
-	 default:
-	 break;
-	 }*/
-	return ret;
+	switch(ajaxHandler) {
+		case AjaxHandler.Prototype:
+			return handleClassPropertyPrototype!(T, m)();
+		default:
+			break;
+	}
+	return "";
 }

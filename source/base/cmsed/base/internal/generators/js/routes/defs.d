@@ -19,6 +19,14 @@ struct jsRouteName {
 	string name;
 }
 
+struct jsRouteParameters {
+	/*this(string[] args ...) {
+	 params = args;
+	 }*/
+	
+	string[] params;
+}
+
 /**
  * Properties
  */
@@ -117,6 +125,19 @@ pure string getJSRouteName(C)() {
 	}
 	
 	return C.stringof;
+}
+
+pure string[] getRouteParams(C, string f)() {
+	C c = new C;
+	string[] ret;
+	
+	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+		static if (__traits(compiles, {jsRouteParameters rp = UDA;})) {
+			ret ~= UDA.params;
+		}
+	}
+	
+	return ret;
 }
 
 shared static this() {
