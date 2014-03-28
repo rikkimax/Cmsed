@@ -97,9 +97,10 @@ struct RouteGroupId {
 }
 
 struct RouteGroupIds {
-	this(string[] args ...) {
-		routeNames = args;
-	}
+	// GRR GRR this _was_ working
+	/*this(string[] args ...) {
+	 routeNames = args;
+	 }*/
 	
 	string[] routeNames;
 }
