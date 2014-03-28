@@ -15,9 +15,6 @@ shared static this() {
 		registerStaticFile(pathToOOPHandler, cast(string)oopHandler, "javascript");
 		registerStaticFile(pathToAjaxHandler, cast(string)ajaxHandler, "javascript");
 		
-		import std.file;
-		append("out.txt", "hit\n");
-		
 		foreach(name; __traits(allMembers, OOPHandler)) {
 			registerStaticFile(pathToLibraries ~ name, cast(string)__traits(getMember, OOPHandler, name), "javascript");
 		}
