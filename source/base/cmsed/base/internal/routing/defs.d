@@ -173,13 +173,10 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			if (v.check is null || (v.check !is null && v.check())) {
 				currentRoute = cast(RouteInformation)k;
 				v.route();
+				
 				if (http_response.headerWritten) {
 					// we succedded in the request
 					// now its time to stop
-					debug {
-						import std.file;
-						append("out.txt", currentRoute.className ~ " " ~ currentRoute.functionName ~ "\n");
-					}
 					return;
 				} else {
 					// we failed in our request
