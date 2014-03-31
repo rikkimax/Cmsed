@@ -45,10 +45,28 @@ class Home : OORoute {
 ```
 Note UDAs (or attributes) are stackable. This means you can have quite a lot of those RouteGroups!
 
-There are more check out [routing.d](https://github.com/rikkimax/Cmsed/blob/master/source/cmsed/base/routing.d).
+There are more check out [routing/defs.d](https://github.com/rikkimax/Cmsed/blob/master/source/cmsed/base/internal/routing/base.d).
 
-The current request and response is located in routing.d as well. As http_request and http_response respectively.
+The current request and response is located in defs.d as well. As http_request and http_response respectively.
 
+You can utilise arguments to route functions to specify parameters. This includes from form (post ext.) and query string for get.
+
+```D
+class Test : OORoute {
+	@RouteFunction(RouteType.Get, "/someargs")
+	void someArgs(string a, string b) {
+		http_response.writeBody(a ~ ", " ~ b);
+	}
+}
+```
+
+Forces errors and checks against e.g. string/integer/float/boolean arguments. Enables calling it via: http://example.com/someargs?a=text1&b=text2<br/>
+You can further do validation from the arguments.
+
+**Javascript generation**
+
+Javascript is automatically generated to represent the data models and routes. This enables you to not need to write any ajax code.<br/>
+Configuration of these features is in the apropriete defs files under [cmsed/base/internal/generators/js](https://github.com/rikkimax/Cmsed/tree/master/source/base/cmsed/base/internal/generators/js)
 
 **Models**
 
