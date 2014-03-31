@@ -47,7 +47,7 @@ bool delegate() getCheckFuncOfRoute(T, string m)() {
 	bool func() {
 		string[string] params;
 		mixin("import " ~ moduleName!T ~ ";");
-		mixin(handleCheckofRoute!(getRouteTypeFromMethod!(T, m), getPathFromMethod!(T, m)));
+		mixin(handleCheckofRoute!(T, m, getRouteTypeFromMethod!(T, m), getPathFromMethod!(T, m)));
 		http_request.params = params;
 		
 		static if (hasFilters!(T, m)) {
@@ -81,16 +81,15 @@ bool delegate() getCheckFuncOfRoute(RouteType type, string path)() {
 /**
  * Creates a delegate specifically for checking if a route is current
  */
-pure void delegate() getFuncOfRoute(T, string m)() {
+void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 	void func() {
-		T t = new T;
 		static if (useRenderOptionalFunc!(T, m)) {
-			if (mixin("t." ~ m)()) {
+			if (mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")")) {
 				enum isFirstExecute = false;
 				http_response.render!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute);
 			}
 		} else {
-			mixin("t." ~ m)();
+			mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ");");
 		}
 	}
 	

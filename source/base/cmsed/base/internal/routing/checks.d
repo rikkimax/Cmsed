@@ -2,6 +2,7 @@ module cmsed.base.internal.routing.checks;
 import cmsed.base.internal.routing.defs;
 import cmsed.base.util : split;
 import std.conv : to;
+import std.traits : ParameterTypeTuple, ParameterIdentifierTuple, isBasicType;
 
 pure RouteType getRouteTypeFromMethod(C, string f)() {
 	C c = new C;
@@ -143,6 +144,8 @@ pure bool isARouteClass(T)() {
 
 /**
  * Generates code to check against a specified path.
+ * Checks to make sure its valid.
+ * If invalid input given, 400 out.
  * 
  * Supported paths for generations:
  * 		/static/path
@@ -150,7 +153,7 @@ pure bool isARouteClass(T)() {
  * 		/static/path/:myparam/:myparam2
  * 		/static/path/:myparam/*
  */
-pure string handleCheckofRoute(RouteType type, string path)() {
+pure string handleCheckofRoute(T, string m, RouteType type, string path, T t = new T)() {
 	string ret;
 	ret ~= "string[] pathSplit;\n";
 	ret ~= "if (http_request.path.length > 1) pathSplit = http_request.path[1 .. $].split(\"/\");\n";
@@ -205,6 +208,57 @@ F1: foreach(i, s; strSplit) {
 	ret ~= "} else {\n";
 	ret ~= "    return false;\n";
 	ret ~= "}\n";
+	
+	
+	// check types of values in arguments of function
+	// return false if not valid.
+	
+	enum argN = ParameterIdentifierTuple!(__traits(getMember, t, m));
+	
+	foreach(i, argT; ParameterTypeTuple!(__traits(getMember, t, m))) {
+		ret ~= "if (\"" ~ argN[i] ~ "\" !in http_request.query) {\n";
+		ret ~= "    http_response.statusCode = HTTPStatus.badRequest;\n";
+		ret ~= "    http_response.statusPhrase = \"Missing parameter: " ~ argN[i] ~ "\";";
+		ret ~= "    return true;\n";
+		ret ~= "}\n";
+		
+		static if (is(argT == string) || is(argT == dstring) || is(argT == wstring)) {
+		} else static if (isBasicType!argT) {
+			ret ~= "try {\n";
+			ret ~= "    " ~ argT.stringof ~ "value = to!(" ~ argT.stringof ~ ")(" ~ argN[i] ~ ");\n";
+			ret ~= "} catch(Exception e) {\n";
+			ret ~= "    http_response.statusCode = HTTPStatus.badRequest;\n";
+			ret ~= "    http_response.statusPhrase = \"Parameter "~ argN[i] ~ " must be of type " ~ argT.stringof ~ "\";";
+			ret ~= "    return true;\n";
+			ret ~= "}\n";
+		} else {
+			ret ~= "return false;\n";
+			static assert(0, "Cannot use type: " ~ argT.stringof ~ " as a route argument type");
+		}
+	}
+	
+	
+	return ret;
+}
+
+/**
+ * 
+ */
+pure string paramsGot(T, string m, T t = new T)() {
+	string ret;
+	
+	enum argN = ParameterIdentifierTuple!(__traits(getMember, t, m));
+	foreach(i, argT; ParameterTypeTuple!(__traits(getMember, t, m))) {
+		if (is(argT == string) || is(argT == dstring) || is(argT == wstring)) {
+			ret ~= "cast(" ~ argT.stringof ~ ")http_request.query[\"" ~ argN[i] ~ "\"], ";
+		} else {
+			ret ~= "to!" ~ argT.stringof ~ "(http_request.query[\"" ~ argN[i] ~ "\"]), ";
+		}
+	}
+	
+	if (ret.length > 0) {
+		ret.length -= 2;
+	}
 	
 	return ret;
 }

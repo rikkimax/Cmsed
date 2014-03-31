@@ -149,6 +149,8 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		http_request = req;
 		http_response = res;
 		
+		http_response.statusCode = HTTPStatus.ok;
+		
 		if ("X-HTTP-Method-Override" in req.headers) {
 			switch(req.headers["X-HTTP-Method-Override"].toLower()) {
 				case "get":
@@ -172,6 +174,9 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		
 		foreach	(k, v; routes) {
 			if (v.check is null || (v.check !is null && v.check())) {
+				if (http_response.statusCode != HTTPStatus.ok)
+					break;
+				
 				currentRoute = cast(RouteInformation)k;
 				v.route();
 				
@@ -245,7 +250,8 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			res.statusCode = HTTPStatus.notFound;
 		if (runErrorRouteFunc()) return;
 		
-		res.statusCode = HTTPStatus.internalServerError;
+		if (res.statusCode == HTTPStatus.notFound)
+			res.statusCode = HTTPStatus.internalServerError;
 		if (runErrorRouteFunc()) return;
 		
 		// we hit an error we didn't know how to handle in ANY FORM
@@ -253,7 +259,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		// output nothing to client.
 		// Make sure they know something bad happend.
 		
-		res.writeVoidBody();
+		res.writeBody("Error " ~ to!string(res.statusCode) ~ ": " ~ res.statusPhrase);
 		
 		string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
 		if (http_request.method == HTTPMethod.GET)
