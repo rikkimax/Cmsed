@@ -6,7 +6,6 @@ module cmsed.base;
 
 public import cmsed.base.defs;
 public import cmsed.base.main;
-public import cmsed.base.config;
 public import cmsed.base.util;
 public import cmsed.base.cache;
 public import cmsed.base.filters;

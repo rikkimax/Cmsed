@@ -1,6 +1,6 @@
 module cmsed.base.registration.routes;
 import cmsed.base.registration.widgetroute;
-import cmsed.base.config;
+import cmsed.base.internal.config;
 import cmsed.base.internal.routing;
 import cmsed.base.internal.generators.js.routes.defs;
 import std.file : write;

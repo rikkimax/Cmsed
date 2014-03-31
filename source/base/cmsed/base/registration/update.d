@@ -1,6 +1,6 @@
 module cmsed.base.registration.update;
 import cmsed.base.util;
-import cmsed.base.config : hasConfigurationChanged;
+import cmsed.base.internal.config : hasConfigurationChanged;
 import cmsed.base.timezones : rebuildTimeZones;
 import vibe.core.core : exitEventLoop, runTask, sleep, setTaskEventCallback, TaskEvent;
 import vibe.core.driver : getEventDriver;

@@ -1,7 +1,7 @@
 module cmsed.base.main;
 import cmsed.base.internal.routing;
 import cmsed.base.internal.sessionstorage;
-import cmsed.base.config;
+import cmsed.base.internal.config;
 import cmsed.base.registration;
 import vibe.d;
 import dvorm;
@@ -172,9 +172,12 @@ bool runIteration(bool isInstall) {
 			HTTPServerSettings settings = new HTTPServerSettings();
 			settings.port = configuration.bind.port;
 			settings.bindAddresses = cast(string[])configuration.bind.ip;
-			settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
+			
+			if (configuration.logging.accessFile != "")
+				settings.accessLogFile = buildPath(configuration.logging.dir, configuration.logging.accessFile);
+			
 			settings.sessionStore = new DbSessionStore;
-			//settings.options |= HTTPServerOption.distribute;
+			settings.options |= HTTPServerOption.distribute;
 			
 			if (configuration.bind.ssl.cert != "" && configuration.bind.ssl.key != "")
 				settings.sslContext = new SSLContext(configuration.bind.ssl.cert, configuration.bind.ssl.key);

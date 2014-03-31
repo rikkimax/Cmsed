@@ -1,7 +1,7 @@
 module cmsed.base.internal.routing.parser;
 import cmsed.base.internal.routing.defs;
 import cmsed.base.internal.routing.checks;
-import cmsed.base.config : configuration;
+import cmsed.base.internal.config : configuration;
 
 import vibe.d : render, compileDietFile, MemoryOutputStream, HTTPMethod;
 

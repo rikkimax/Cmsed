@@ -1,5 +1,5 @@
 module cmsed.base.internal.routing.defs;
-import cmsed.base.config : configuration;
+import cmsed.base.internal.config : configuration;
 import cmsed.base.internal.routing.parser;
 public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod;
 

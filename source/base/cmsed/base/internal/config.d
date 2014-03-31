@@ -1,4 +1,4 @@
-module cmsed.base.config;
+module cmsed.base.internal.config;
 import cmsed.base.internal.routing;
 import dvorm.connection;
 import dvorm.email.config;

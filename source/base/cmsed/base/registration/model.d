@@ -1,5 +1,5 @@
 module cmsed.base.registration.model;
-import cmsed.base.config;
+import cmsed.base.internal.config;
 import cmsed.base.internal.generators.js.model;
 import dvorm.logging;
 import std.file : write;
