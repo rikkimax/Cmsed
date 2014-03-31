@@ -1,10 +1,10 @@
 module cmsed.base.internal.generators.js.routes.generate;
-import cmsed.base.internal.generators.js.routes.defs;
+import cmsed.base.internal.generators.js.routes.checks;
 import cmsed.base.internal.generators.js.routes.prototype;
 import cmsed.base.internal.generators.js.defs;
 import cmsed.base.internal.routing.checks;
-import dvorm.util;
 import std.traits : isBasicType, isBoolean;
+import dvorm.util;
 
 string generateJsFunc(T)() {
 	T t = newValueOfType!T;

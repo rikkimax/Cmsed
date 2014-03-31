@@ -1,5 +1,5 @@
 ﻿module cmsed.base.internal.generators.js.routes.prototype;
-import cmsed.base.internal.generators.js.routes.defs;
+import cmsed.base.internal.generators.js.routes.checks;
 import cmsed.base.internal.routing.checks;
 import cmsed.base.util : split;
 import dvorm.util;
