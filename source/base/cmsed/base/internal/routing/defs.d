@@ -1,7 +1,7 @@
 module cmsed.base.internal.routing.defs;
 import cmsed.base.internal.config : configuration;
 import cmsed.base.internal.routing.parser;
-public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod;
+public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod, httpStatusText;
 
 import std.string : toLower;
 import cmsed.base.util : split;
@@ -259,7 +259,8 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		// output nothing to client.
 		// Make sure they know something bad happend.
 		
-		res.writeBody("Error " ~ to!string(res.statusCode) ~ ": " ~ res.statusPhrase);
+		res.writeBody("Last resort error " ~ to!string(res.statusCode) ~ ": " ~
+		              (res.statusPhrase.length ? res.statusPhrase : httpStatusText(res.statusCode)));
 		
 		string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
 		if (http_request.method == HTTPMethod.GET)
