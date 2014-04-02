@@ -1,6 +1,7 @@
 module cmsed.test.routes.test;
 import cmsed.base;
 import cmsed.test.models;
+import vibe.d : Json;
 
 @jsRouteName("test_route")
 class Test : OORoute {
@@ -16,5 +17,17 @@ class Test : OORoute {
 	@RouteFunction(RouteType.Get, "/someargs")
 	void someArgs(string a, string b) {
 		http_response.writeBody(a ~ ", " ~ b);
+	}
+	
+	@RouteFunction(RouteType.Get, "/mytext")
+	string myText() {
+		return "Hello World!";
+	}
+	
+	@RouteFunction(RouteType.Get, "/myjson")
+	Json myJson() {
+		Json ret = Json.emptyObject();
+		ret["Hello"] = Json("World!");
+		return ret;
 	}
 }

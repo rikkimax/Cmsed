@@ -3,10 +3,10 @@ import cmsed.base.internal.routing.defs;
 import cmsed.base.internal.routing.checks;
 import cmsed.base.internal.config : configuration;
 
-import vibe.d : render, compileDietFile, MemoryOutputStream, HTTPMethod;
+import vibe.d : render, compileDietFile, MemoryOutputStream, HTTPMethod, Json;
 
 import std.file : append, write;
-import std.traits : moduleName, ReturnType;
+import std.traits : moduleName, ReturnType, isSomeString;
 import std.string : lastIndexOf;
 import std.path : buildPath;
 
@@ -85,8 +85,18 @@ void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 	void func() {
 		static if (useRenderOptionalFunc!(T, m)) {
 			if (mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")")) {
-				enum isFirstExecute = false;
-				http_response.render!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute);
+				if (!http_response.headerWritten) {
+					enum isFirstExecute = false;
+					http_response.render!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute);
+				}
+			}
+		} else static if (is(ReturnType!(mixin("t." ~ m)) : Json)) {
+			if (!http_response.headerWritten) {
+				http_response.writeJsonBody(mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")"));
+			}
+		} else static if (isSomeString!(ReturnType!(mixin("t." ~ m)))) {
+			if (!http_response.headerWritten) {
+				http_response.writeBody(mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")"));
 			}
 		} else {
 			mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ");");
