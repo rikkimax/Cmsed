@@ -1,7 +1,7 @@
 module cmsed.base.internal.routing.defs;
 import cmsed.base.internal.config : configuration;
 import cmsed.base.internal.routing.parser;
-public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod;
+public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod, httpStatusText;
 
 import std.string : toLower;
 import cmsed.base.util : split;
@@ -151,48 +151,6 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 		
 		http_response.statusCode = HTTPStatus.ok;
 		
-		if ("X-HTTP-Method-Override" in req.headers) {
-			switch(req.headers["X-HTTP-Method-Override"].toLower()) {
-				case "get":
-					http_request.method = HTTPMethod.GET;
-					break;
-				case "post":
-					http_request.method = HTTPMethod.POST;
-					break;
-				case "put":
-					http_request.method = HTTPMethod.PUT;
-					break;
-				case "delete":
-					http_request.method = HTTPMethod.DELETE;
-					break;
-				default:
-					res.statusCode = HTTPStatus.badRequest;
-					res.writeVoidBody();
-					return;
-			}
-		}
-		
-		foreach	(k, v; routes) {
-			if (v.check is null || (v.check !is null && v.check())) {
-				if (http_response.statusCode != HTTPStatus.ok)
-					break;
-				
-				currentRoute = cast(RouteInformation)k;
-				v.route();
-				
-				if (http_response.headerWritten) {
-					// we succedded in the request
-					// now its time to stop
-					return;
-				} else {
-					// we failed in our request
-					// try again
-					// or we didn't write any headers
-					// (just in case another route is listening on this exact path / http type)
-				}
-			}
-		}
-		
 		bool runErrorRouteFunc() {
 			if (res.statusCode in errorRoutes) {
 				// basically this current status code (from the above set of routes or notFound)
@@ -242,24 +200,78 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 			return false;
 		}
 		
-		// if we've reached this point then we just don't have the requested route.
-		// so now we'll work from our error handling code
-		
-		// error 404
-		if (res.statusCode == HTTPStatus.ok)
-			res.statusCode = HTTPStatus.notFound;
-		if (runErrorRouteFunc()) return;
-		
-		if (res.statusCode == HTTPStatus.notFound)
-			res.statusCode = HTTPStatus.internalServerError;
-		if (runErrorRouteFunc()) return;
+		try {
+			if ("X-HTTP-Method-Override" in req.headers) {
+				switch(req.headers["X-HTTP-Method-Override"].toLower()) {
+					case "get":
+						http_request.method = HTTPMethod.GET;
+						break;
+					case "post":
+						http_request.method = HTTPMethod.POST;
+						break;
+					case "put":
+						http_request.method = HTTPMethod.PUT;
+						break;
+					case "delete":
+						http_request.method = HTTPMethod.DELETE;
+						break;
+					default:
+						res.statusCode = HTTPStatus.badRequest;
+						res.writeVoidBody();
+						return;
+				}
+			}
+			
+			foreach	(k, v; routes) {
+				if (v.check is null || (v.check !is null && v.check())) {
+					if (http_response.statusCode != HTTPStatus.ok)
+						break;
+					
+					currentRoute = cast(RouteInformation)k;
+					v.route();
+					
+					if (http_response.headerWritten) {
+						// we succedded in the request
+						// now its time to stop
+						return;
+					} else {
+						// we failed in our request
+						// try again
+						// or we didn't write any headers
+						// (just in case another route is listening on this exact path / http type)
+					}
+				}
+			}
+			
+			// if we've reached this point then we just don't have the requested route.
+			// so now we'll work from our error handling code
+			
+			// error 404
+			if (res.statusCode == HTTPStatus.ok)
+				res.statusCode = HTTPStatus.notFound;
+			if (runErrorRouteFunc()) return;
+			
+			if (res.statusCode == HTTPStatus.notFound)
+				res.statusCode = HTTPStatus.internalServerError;
+			if (runErrorRouteFunc()) return;
+			
+		} catch (Exception e) {
+			// one last time try to push it into the error routes.
+			try {
+				res.statusCode = HTTPStatus.internalServerError;
+				if (runErrorRouteFunc()) return;
+			} catch(Exception e) {
+				// just let it error out *sigh*
+			}
+		}
 		
 		// we hit an error we didn't know how to handle in ANY FORM
 		// Log it to file.
 		// output nothing to client.
 		// Make sure they know something bad happend.
 		
-		res.writeBody("Error " ~ to!string(res.statusCode) ~ ": " ~ res.statusPhrase);
+		res.writeBody("Last resort error " ~ to!string(res.statusCode) ~ ": " ~
+		              (res.statusPhrase.length ? res.statusPhrase : httpStatusText(res.statusCode)));
 		
 		string oFile = buildPath(configuration.logging.dir, configuration.logging.errorAccessFile);
 		if (http_request.method == HTTPMethod.GET)
