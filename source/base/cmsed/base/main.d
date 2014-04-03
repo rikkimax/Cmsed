@@ -9,10 +9,10 @@ import dvorm.email;
 import std.path : buildPath;
 import std.file : write;
 import std.process : execute;
-import getopt = std.getopt;
 import std.string : toLower, split;
 import core.time : dur;
 import core.runtime;
+
 
 /**
  * A main function that makes sure a node stays up
@@ -27,13 +27,14 @@ version(ExcludeCmsedMain) {
 	int main(string[] args) {
 		bool runForever;
 		bool isInstallMode;
+        string mode;
 		
-		int retHelpValue = handleHelp(runForever, isInstallMode);
+		int retHelpValue = handleHelp(runForever, isInstallMode, mode);
 		if (retHelpValue < 0) return retHelpValue;
 		
 		lowerPrivileges();
 		if (!runForever) {
-			return runIteration(isInstallMode) ? 2 : 1;
+			return runIteration(isInstallMode, mode) ? 2 : 1;
 		} else {
 			while(true) {
 				auto result = execute([args[0], "--runIteration"]);
@@ -49,7 +50,7 @@ version(ExcludeCmsedMain) {
 						// in this case it was forcefull closed
 					default:
 						// dieing was forcefull :(
-						sleep(dur!"minutes"(1));
+						sleep(dur!"minutes"(1));  // TODO: Why minutes? may be seconds? 3 or 5? whan manualy shutdown server it is boring to wait 1 minute!
 				}
 			}
 		}
@@ -68,13 +69,12 @@ version(ExcludeCmsedMain) {
  * Params:
  * 		runForever = 	Should this program run forever? Basically auto restart itself.
  * 		isInstallMode = Are we installing ourselves against the stack?
+ *      mode =          Mode to run program in
  */
-int handleHelp(out bool runForever, out bool isInstallMode) {
-	bool modeHelp;
-	
+int handleHelp(out bool runForever, out bool isInstallMode, out string mode) {
 	getOption("forever", &runForever, "Runs the web service continuesly even upon error");
 	getOption("install|i", &isInstallMode, "Starts an iteration of the web service in install mode");
-	getOption("mode", &modeHelp, "Sets the mode to start in. Valid modes: Web, Backend");
+	getOption("mode", &mode, "Sets the mode to start in. Valid modes: Web, Backend");
 	
 	try {
 		if (finalizeCommandLineOptions()) {
@@ -102,13 +102,11 @@ int handleHelp(out bool runForever, out bool isInstallMode) {
  * 						They cannot communicate with you however
  * 
  * Params:
+ *      mode =          Mode got from cli options
  * 		isWebMode = 	Should this node start the web server?
  * 		isBackendMode = Should this node care about hosting a backend functionality?
  */
-void handleModeArg(out bool isWebMode, out bool isBackendMode) {
-	string[] args = Runtime.args;
-	string mode;
-	getopt.getopt(args, "mode", &mode);
+void handleModeArg(string mode, out bool isWebMode, out bool isBackendMode) {
 	
 	if (mode.length == 0) {
 		isWebMode = true;
@@ -132,10 +130,10 @@ void handleModeArg(out bool isWebMode, out bool isBackendMode) {
  * Runs a single iteration of the node.
  * Weather this is in the form of a web server or backend node depends solely upon cli arguments.
  */
-bool runIteration(bool isInstall) {
+bool runIteration(bool isInstall, string mode) {
 	bool isWebMode;
 	bool isBackendMode;
-	handleModeArg(isWebMode, isBackendMode);
+	handleModeArg(mode, isWebMode, isBackendMode);
 	
 	try  {
 		getConfiguration("base.json");
