@@ -251,9 +251,14 @@ class CTFEURLRouter : HTTPServerRequestHandler {
 				res.statusCode = HTTPStatus.notFound;
 			if (runErrorRouteFunc()) return;
 			
-			if (res.statusCode == HTTPStatus.notFound)
+			if (res.statusCode == HTTPStatus.notFound) {
+				res.writeBody("Error " ~ to!string(res.statusCode) ~ ": " ~
+				              (res.statusPhrase.length ? res.statusPhrase : httpStatusText(res.statusCode)));
+				return;
+			} else {
 				res.statusCode = HTTPStatus.internalServerError;
-			if (runErrorRouteFunc()) return;
+				if (runErrorRouteFunc()) return;
+			}
 			
 		} catch (Exception e) {
 			// one last time try to push it into the error routes.
