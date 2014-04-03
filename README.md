@@ -1,7 +1,8 @@
 Cmsed
 =====
 
-A component library for Vibe that functions as a CMS.
+A component library for Vibe that functions as a CMS.<br/>
+There is currently a **getting started guide** in the wiki [link](https://github.com/rikkimax/Cmsed/wiki/Tutorial-Getting-started) little incomplete at the moment. But will help a lot if you are new.
 
 Features:
 ---------
