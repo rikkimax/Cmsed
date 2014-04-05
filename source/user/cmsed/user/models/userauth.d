@@ -45,6 +45,10 @@ class UserAuthModel {
 	mixin OrmModel!UserAuthModel;
 }
 
+// change the hash version as the hash algorithym changes.
+// allows for 'upgrading' of passwords as needed.
+enum CURRENT_HASH_ALG_VERSION = 0;
+
 /**
  * A simple ripemd 160 hashed password to authenticate against.
  * Stores a hash and can compare and set via a non hashed string.
@@ -52,19 +56,30 @@ class UserAuthModel {
 class UserPassword {
 	@dbId {
 		string hash;
+		ubyte hashVersion;
 	}
 	
 	void opAssign(string text) {
+		hashVersion = CURRENT_HASH_ALG_VERSION;
 		hash = hashText(text);
 	}
 	
-	bool opCmp(string op)(string text) {
+	bool opEquals(string text) {
 		return hash == hashText(text);
+	}
+	
+	@property bool needsToBeUpgraded() {
+		// automatically upgrade the hash to current version.
+		return hashVersion < CURRENT_HASH_ALG_VERSION;
 	}
 	
 	private {
 		string hashText(string text) {
-			return Base64.encode(ripemd160Of(text));
+			if (hashVersion == 0) {
+				return Base64.encode(ripemd160Of(text));
+			}
+			
+			assert(0);
 		}
 	}
 }

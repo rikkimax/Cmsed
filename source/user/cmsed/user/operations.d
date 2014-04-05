@@ -22,6 +22,11 @@ UserModel getLoggedInUser() {
 /**
  * Try and log a user in. Given a username and password.
  * A username can be an email.
+ * A password is not required to work.
+ * 
+ * Params:
+ * 		userName = 	The username of the user. Can be email.
+ * 		password = 	The password given. Secret info to identifiy is the user.
  */
 bool login(string userName, string password) {
 	UserModel um = getUserFromAuth(userName, password);
@@ -62,16 +67,20 @@ void logout() {
 private {
 	shared static this() {
 		UserModel dbAuthProvider(string user, string pass) {
-			UserPassword up = new UserPassword;
-			up = pass;
-			UserAuthModel[] uam = UserAuthModel.query()
-				.username_eq(user)
-					.password_hash_eq(up.hash)
-					.find();
+			UserAuthModel[] uams = UserAuthModel.query()
+				.username_eq(user).find();
 			
-			if (uam.length == 0) return null;
+			foreach(uam; uams) {
+				if (uam.password == pass) {
+					if (uam.password.needsToBeUpgraded) {
+						uam.password = pass;
+						uam.save();
+					}
+					return uam.user.getUser();
+				}
+			}
 			
-			return uam[0].user.getUser();
+			return null;
 		}
 		
 		registerAuthProvider(&dbAuthProvider);
