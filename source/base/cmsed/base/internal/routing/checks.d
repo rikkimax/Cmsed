@@ -2,7 +2,7 @@ module cmsed.base.internal.routing.checks;
 import cmsed.base.internal.routing.defs;
 import cmsed.base.util : split;
 import std.conv : to;
-import std.traits : ParameterTypeTuple, ParameterIdentifierTuple, isBasicType;
+import std.traits : ParameterTypeTuple, ParameterIdentifierTuple, isBasicType, ReturnType;
 
 pure RouteType getRouteTypeFromMethod(C, string f)() {
 	C c = new C;
@@ -33,8 +33,13 @@ pure string getRouteTemplate(C, string f)() {
 }
 
 pure bool useRenderOptionalFunc(C, string f)() {
+	static if (__traits(hasMember, Object, f)) {
+		return false;
+	}
+	
 	C c = new C;
-	static if (is(ReturnType!(mixin("C." ~ f)) == bool)) {
+	
+	static if (is(ReturnType!(mixin("c." ~ f)) == bool)) {
 		return true;
 	} else {
 		return false;
