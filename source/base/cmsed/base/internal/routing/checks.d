@@ -32,14 +32,10 @@ pure string getRouteTemplate(C, string f)() {
 	return ret;
 }
 
-pure bool useRenderOptionalFunc(C, string f)() {
-	C c = new C;
-	static if (is(ReturnType!(mixin("C." ~ f)) == bool)) {
-		return true;
-	} else {
-		return false;
-	}
-}
+//pure bool useRenderOptionalFunc(C, string f)() {
+    //C c = new C;
+    //return is(ReturnType!(mixin("c." ~ f)) == bool);
+//}
 
 pure string getPathFromMethod(C, string f)() {
 	C c = new C;
