@@ -1,4 +1,7 @@
 *.di
 *.html
 .dub/dub.json
+*.swp
+*.swo
 package.userprefs
+bin/

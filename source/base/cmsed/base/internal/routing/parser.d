@@ -21,7 +21,7 @@ void registerRouteHandler(T)() if (isARouteClass!T()) {
 	
 	foreach(string f; __traits(allMembers, T)) {
 		static if (isRoute!(T, f)()) {
-			static if (useRenderOptionalFunc!(T, f)()) {
+			static if (is(ReturnType!(mixin("t." ~ f)) == bool)) {
 				handleFirstExecute!(T, f);
 			}
 			
@@ -83,11 +83,11 @@ bool delegate() getCheckFuncOfRoute(RouteType type, string path)() {
  */
 void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 	void func() {
-		static if (useRenderOptionalFunc!(T, m)) {
+		static if (is(ReturnType!(mixin("t." ~ m)) == bool)) {
 			if (mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")")) {
 				if (!http_response.headerWritten) {
 					enum isFirstExecute = false;
-					http_response.render!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute);
+					http_response.render!(getRouteTemplate!(T, m)() ~ ".dt", currentRoute, isFirstExecute);
 				}
 			}
 		} else static if (is(ReturnType!(mixin("t." ~ m)) : Json)) {
@@ -109,8 +109,8 @@ void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 /**
  * Upon adding a template for a specific route execute it, this is used for e.g. getting all widgets
  */
-pure void handleFirstExecute(T, string f)() {
+void handleFirstExecute(T, string f)() {
 	enum isFirstExecute = true;
-	auto currentRoute = RouteInformation(getRouteTypeFromMethod!(T, f)(), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)());
+	auto currentRoute = new RouteInformation(getRouteTypeFromMethod!(T, f)(), moduleName!T, T.stringof, f, getPathFromMethod!(T, f)());
 	compileDietFile!(getRouteTemplate!(T, f)() ~ ".dt", currentRoute, isFirstExecute)(new MemoryOutputStream());
 }
