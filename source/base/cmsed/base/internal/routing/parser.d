@@ -21,7 +21,6 @@ void registerRouteHandler(T)() if (isARouteClass!T()) {
 	
 	foreach(string f; __traits(allMembers, T)) {
 		static if (isRoute!(T, f)()) {
-			//static if (useRenderOptionalFunc!(T, f)()) {
 			static if (is(ReturnType!(mixin("c." ~ f)) == bool)) {
 				handleFirstExecute!(T, f);
 			}
@@ -84,7 +83,6 @@ bool delegate() getCheckFuncOfRoute(RouteType type, string path)() {
  */
 void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 	void func() {
-		//static if (useRenderOptionalFunc!(T, m)) {
 		static if (is(ReturnType!(mixin("t." ~ m)) == bool)) {
 			if (mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")")) {
 				if (!http_response.headerWritten) {
