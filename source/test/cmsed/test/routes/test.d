@@ -10,6 +10,11 @@ class Test : OORoute {
 		http_response.writeBody("");
 	}
 	
+	@RouteFunction(RouteType.Get, "/myindex", "index")
+	bool myindex() {
+		return true;
+	}
+	
 	@RouteGroup(null, "/.svc") {
 		mixin RestfulRoute!(RestfulProtection.All, Book3, Page3);
 	}
