@@ -22,6 +22,9 @@ struct GenerateData {
 	string findOneArgs;
 	string findOneSet;
 	string findOneSetArgs;
+	
+	string queryCreator;
+	string queryParameters;
 }
 
 struct shouldNotGenerateJavascriptModel {}

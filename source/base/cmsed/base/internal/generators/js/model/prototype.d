@@ -15,6 +15,11 @@ void handleClassStartPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)
 	
 	data.findOneArgs ~= getTableName!T ~ ".prototype.findOne = function(";
 	data.findOneSet ~= """    var ret = new Ajax.Request(\"" ~ pathToRestfulRoute ~ getTableName!T ~ "/\" + """;
+	
+	data.queryCreator ~= """
+Books3.prototype.query = function() {
+    return {
+        props: {""";
 }
 
 void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
@@ -61,11 +66,40 @@ void handleClassEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(r
     ret = ret.responseJSON();
     return new " ~ getTableName!T ~ "(" ~ data.findOneSetArgs ~ ");\n""";
 	data.findOneSet ~= "};\n";
+	
+	if (data.queryCreator[$-1] == ',')
+		data.queryCreator.length--;
+	
+	data.queryCreator ~= """
+        },
+        offset: undefined,
+        maxAmount: undefined,
+        find: function () {
+            this_ = this;
+            var ret = new Ajax.Request(\"" ~ pathToRestfulRoute ~ getTableName!T ~ "/\", {
+                method: \"POST\",
+                parameters: {
+" ~ data.queryParameters ~ "                    __offset: this_.offset,
+                    __maxAmount: this_.maxAmount
+                },
+                onSuccess: function (event) {
+
+                },
+                onFailure: function (event) {
+
+                }
+            });
+            ret = ret.responseJSON();
+        }
+    };
+};
+""";
 }
 
 void handleFileEndPrototype(T, ushort ajaxProtection, T t = newValueOfType!T)(ref GenerateData data) {
 	data.ret ~= data.findOneArgs;
 	data.ret ~= data.findOneSet;
+	data.ret ~= data.queryCreator;
 }
 
 void handleClassPropertyObjectPropertyPrototype(T, ushort ajaxProtection, string m, string n, // params
@@ -85,6 +119,11 @@ void handleClassPropertyObjectPropertyPrototype(T, ushort ajaxProtection, string
 			data.savepropParams ~= "                " ~ name1 ~ "_" ~ name2 ~ ": this_." ~ name1 ~ "_" ~ name2 ~ ",\n";
 		}
 	}
+	
+	foreach(action; ["eq", "neq", "lt", "lte", "mt", "mte", "like"]) {
+		data.queryParameters ~= "                    " ~ name1 ~ "_" ~ name2 ~ "_" ~ action ~ ": this_.props." ~ name1 ~ "_" ~ name2 ~ "_" ~ action ~ ",\n";
+		data.queryCreator ~= "\n            " ~ name1 ~ "_" ~ name2 ~ "_" ~ action ~ ": undefined,";
+	}
 }
 
 void handleClassPropertyPrototype(T, ushort ajaxProtection, string m, // params
@@ -101,9 +140,14 @@ void handleClassPropertyPrototype(T, ushort ajaxProtection, string m, // params
 			data.findOneSet ~= name;
 			data.saveprop ~= name;
 			data.removeprop ~= name;
-			data.findOneSetArgs ~= "ret." ~ name ~ ", ";
+			data.findOneSetArgs ~= "resht." ~ name ~ ", ";
 			data.savepropParams ~= "                " ~ name ~ ": this_." ~ name ~ ",\n";
 		}
+	}
+	
+	foreach(action; ["eq", "neq", "lt", "lte", "mt", "mte", "like"]) {
+		data.queryParameters ~= "                    " ~ name ~ "_" ~ action ~ ": this_.props." ~ name ~ "_" ~ action ~ ",\n";
+		data.queryCreator ~= "\n            " ~ name ~ "_" ~ action ~ ": undefined,";
 	}
 }
 
