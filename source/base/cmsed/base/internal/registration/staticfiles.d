@@ -1,10 +1,12 @@
 module cmsed.base.internal.registration.staticfiles;
 import cmsed.base.internal.routing;
 import cmsed.base.mimetypes;
+import cmsed.base.util;
 import cmsed.minifier.jsmin;
 import vibe.d;
 import std.path : extension;
 import std.string : toLower;
+import std.datetime;
 
 private shared {
 	ubyte[][string] staticFiles;
@@ -59,6 +61,8 @@ void configureStaticFiles() {
 			string path = http_request.path[staticPath.length .. $].toLower();
 			
 			if (path in staticFiles) {
+				http_response.headers["Cache-Control"] = "No-Store, must-revalidate";
+				http_response.headers["Last-Modified"] = utc0CompiledTimeStamp();
 				http_response.writeBody(cast(ubyte[])staticFiles[path], staticTypes[path]);
 			}
 		}

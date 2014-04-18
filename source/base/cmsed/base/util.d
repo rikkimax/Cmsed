@@ -1,7 +1,7 @@
 module cmsed.base.util;
-import std.uni : toLower;
 import std.datetime : SysTime, Clock;
-import std.string : indexOf;
+import std.string : indexOf, toUpper, toLower;
+import std.conv : to;
 import core.time : Duration;
 
 /**
@@ -18,6 +18,35 @@ SysTime utc0SysTime() {
 	SysTime curr = Clock.currTime();
 	curr -= curr.utcOffset;
 	return curr;
+}
+
+string utc0CompiledTimeStamp() {
+	string timestamp = __TIMESTAMP__;
+	string[] values = timestamp.split(" ");
+	
+	string timeo;
+	timeo ~= values[4] ~ "-";
+	timeo ~= values[1] ~ "-";
+	timeo ~= values[2] ~ " ";
+	timeo ~= values[3];
+	
+	SysTime time = SysTime.fromSimpleString(timeo);
+	auto durr = Clock.currTime().utcOffset;
+	time -= durr;
+	
+	string dayOfWeek = to!string(time.dayOfWeek);
+	string month = to!string(time.month);
+	dayOfWeek = cast(char)toUpper(dayOfWeek[0]) ~ dayOfWeek[1 .. $];
+	month = cast(char)toUpper(month[0]) ~ month[1 .. $];
+	
+	string output;
+	output ~= dayOfWeek ~ ", ";
+	output ~= to!string(time.day) ~ " ";
+	output ~= month ~ " ";
+	output ~= to!string(time.year) ~ " ";
+	output ~= time.toSimpleString().split(" ")[1] ~ " GMT";
+	
+	return output;
 }
 
 /**
