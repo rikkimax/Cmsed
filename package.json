@@ -74,6 +74,13 @@
 				"cmsed:base": "~master",
 				"cmsed:user": "~master"
 			}
+		},
+		{
+			"name": "minifier",
+			"sourcePaths": ["source/minifier/cmsed"],
+			"importPaths": ["source/minifier"],
+			"targetType": "library",
+			"targetPath": "bin/minifier"
 		}
 	],
 	"buildTypes": {
