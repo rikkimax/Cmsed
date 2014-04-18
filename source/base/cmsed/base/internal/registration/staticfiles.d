@@ -1,6 +1,7 @@
 module cmsed.base.internal.registration.staticfiles;
 import cmsed.base.internal.routing;
 import cmsed.base.mimetypes;
+import cmsed.minifier.jsmin;
 import vibe.d;
 import std.path : extension;
 import std.string : toLower;
@@ -12,6 +13,13 @@ private shared {
 }
 
 void registerStaticFile(string name, string text, string mime=null) {
+	debug {
+	} else {
+		if (mime == getTemplateForType("javascript") || mime == "javascript") {
+			text = to!string(minify(to!wstring(text)));
+		}
+	}
+	
 	registerStaticFile(name, cast(ubyte[])text, mime);
 }
 

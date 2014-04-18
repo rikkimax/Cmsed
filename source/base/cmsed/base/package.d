@@ -40,4 +40,10 @@ public import cmsed.base.caches;
  * I blame Soaryn (even though he doesn't even know about this repo).
  */
 
-import cmsed.base.internal;
+public import cmsed.base.internal;
+
+/**
+ * Also a good idea to import the minifier as others may want to use it.
+ */
+
+public import cmsed.minifier;

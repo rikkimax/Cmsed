@@ -37,7 +37,8 @@
 			"dependencies": {
 				"vibe-d": "~master",
 				"dvorm": "~master",
-				"dvorm:email": "~master"
+				"dvorm:email": "~master",
+				"cmsed:minifier": "~master"
 			}
 		},
 		{
