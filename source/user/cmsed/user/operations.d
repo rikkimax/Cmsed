@@ -36,13 +36,6 @@ bool login(string userName, string password) {
 }
 
 /**
- * Check if the username exists in any of the providers.
- */
-bool doesUserExist(string name) {
-	return checker.hasIdentifier(name);
-}
-
-/**
  * Check if a user is in a group.
  */
 bool isUserInGroup(string group) {
