@@ -1,5 +1,6 @@
 module cmsed.user.registration.auth;
 import cmsed.user.models.user;
+import cmsed.user.models.usergroup;
 
 /**
  * Provides an authentication mechanism.
@@ -32,6 +33,7 @@ interface AuthProvider {
 	 */
 	UserModel validCredentials(string identifier, string validator);
 	
+	
 	/**
 	 * Changes the validator value for an identifier
 	 * 
@@ -48,6 +50,20 @@ interface AuthProvider {
 	 * Identifies an auth provider
 	 */
 	@property string identifier();
+	
+	/**
+	 * Get the groups for an identifier
+	 * 
+	 * Params:
+	 * 		identifier = 		The username or email to log the user in by
+	 * 
+	 * Returns:
+	 * 		The groups the identifier belongs to
+	 * 
+	 * See_Also:
+	 * 		UserGroup
+	 */
+	GroupModel[] identifierGroups(string identifier);
 	
 	/*
 	 * Logging
@@ -105,6 +121,18 @@ private {
 		 */
 		@property string identifier() {
 			assert(0);
+		}
+		
+		GroupModel[] identifierGroups(string identifier) {
+			foreach(provider; providers) {
+				if (provider.hasIdentifier(identifier)) {
+					GroupModel[] ret = provider.identifierGroups(identifier);
+					if (ret.length > 0)
+						return ret;
+				}
+			}
+			
+			return null;
 		}
 		
 		/*

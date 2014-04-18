@@ -98,6 +98,18 @@ private {
 			return BUILT_IN_DB_AUTH;
 		}
 		
+		GroupModel[] identifierGroups(string identifier) {
+			UserAuthModel[] uams = UserAuthModel.query()
+				.username_eq(identifier).find();
+			
+			if (uams.length > 0) {
+				UserAuthModel uam = uams[0];
+				return uam.user.getUser().getGroups();
+			}
+			
+			return null;
+		}
+		
 		void logLogin(string identifier) {
 			// this may be a good idea to do something with.
 		}
