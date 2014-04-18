@@ -2,77 +2,167 @@ module cmsed.user.registration.auth;
 import cmsed.user.models.user;
 
 /**
- * Registers functions that provide authentication.
+ * Provides an authentication mechanism.
  */
+interface AuthProvider {
+	
+	/**
+	 * Does a check wheather or not an identifier exists in any provider.
+	 * 
+	 * Params:
+	 * 		identifier =		The username or email that is to be checked against
+	 * 
+	 * Returns:
+	 * 		If the identifier exists or not.
+	 */
+	bool hasIdentifier(string identifier);
+	
+	/**
+	 * Gets a user if can be logged in.
+	 * 
+	 * Params:
+	 * 		identifier = 		The username or email to log the user in by
+	 * 		validator  = 		The password to log the user in by
+	 * 
+	 * Returns:
+	 * 		A UserModel given the login information. Or null if not possible.
+	 * 
+	 * See_Also:
+	 * 		UserModel
+	 */
+	UserModel validCredentials(string identifier, string validator);
+	
+	/**
+	 * Changes the validator value for an identifier
+	 * 
+	 * Params:
+	 * 		identifier = 		The username or email to log the user in by
+	 * 		validator  = 		The password to log the user in by
+	 * 
+	 * Returns:
+	 * 		If the change was successful.
+	 */
+	bool changeValidator(string identifier, string validator);
+	
+	/**
+	 * Identifies an auth provider
+	 */
+	@property string identifier();
+	
+	/*
+	 * Logging
+	 */
+	
+	/**
+	 * Upon login call this.
+	 * 
+	 * Params:
+	 * 		identifier = 		The username or email to log the user in by
+	 */
+	void logLogin(string identifier);
+}
+
+static const AuthChecker checker = new AuthChecker();
+
+/**
+ * Registers an auth provider.
+ */
+void registerAuthProvider(T : AuthProvider)(T provider = new T()) {
+	providers ~= provider;
+}
 
 private {
-	alias UserModel delegate(string username, string password) userDel;
-	alias bool delegate(string username) userExistsDel;
-	userDel[] funcs;
-	userExistsDel[] funcs2;
-}
-
-/**
- * Register an auth provider.
- * Note:
- * 		Does not login a user.
- */
-void registerAuthProvider(userDel del) {
-	synchronized {
-		funcs ~= del;
-	}
-}
-
-/**
- * Registers an auth check against a user/pass combination.
- */
-void registerUserExistsProvider(userExistsDel del) {
-	synchronized {
-		funcs2 ~= del;
-	}
-}
-
-/**
- * Gets a user if can be logged in.
- * 
- * Params:
- * 		user = 		The username or email to log the user in by
- * 		pass = 		The password to log the user in by
- * 
- * Returns:
- * 		Gets a UserModel given the login information. Or null if not possible.
- * 
- * See_Also:
- * 		UserModel
- */
-UserModel getUserFromAuth(string user, string pass) {
-	synchronized {
-		foreach(del; funcs) {
-			UserModel um = del(user, pass);
-			if (um !is null)
-				return um;
+	AuthProvider[] providers;
+	
+	const class AuthChecker : AuthProvider {
+		bool hasIdentifier(string identifier) {
+			foreach(provider; providers) {
+				if (provider.hasIdentifier(identifier)) return true;
+			}
+			return false;
 		}
 		
-		return null;
-	}
-}
-
-/**
- * Does a check wheather or not a username exists in any provider.
- * 
- * Params:
- * 		user =		The username or email that is to be checked against
- * 
- * Returns:
- * 		If the username/email exists or not.
- */
-bool getCheckUserExistsFromAuth(string user) {
-	synchronized {
-		foreach(del; funcs2) {
-			if(del(user))
-				return true;
+		UserModel validCredentials(string identifier, string validator) {
+			foreach(provider; providers) {
+				UserModel returned = provider.validCredentials(identifier, validator);
+				if (returned !is null)
+					return returned;
+			}
+			return null;
 		}
 		
-		return false;
+		bool changeValidator(string identifier, string validator) {
+			foreach(provider; providers) {
+				if (provider.hasIdentifier(identifier))
+					if (provider.changeValidator(identifier, validator))
+						return true;
+			}
+			return false;
+		}
+		
+		/*
+		 * This shouldn't actually be used 
+		 */
+		@property string identifier() {
+			assert(0);
+		}
+		
+		/*
+		 * Logging
+		 */
+		
+		/**
+		 * Upon login call this.
+		 */
+		void logLogin(string identifier) {
+			foreach(provider; providers) {
+				if (provider.hasIdentifier(identifier)) {
+					provider.logLogin(identifier);
+					return;
+				}
+			}
+		}
+		
+		/*
+		 * Util related not inhertited
+		 */
+		
+		/**
+		 * Gets an auth provider base upoon its name
+		 * 
+		 * Params:
+		 * 		identifier	=	The name of the provider
+		 * 
+		 * Return:
+		 * 		The auth provider or null
+		 */
+		AuthProvider getAuthProvider(string identifier) {
+			foreach(provider; providers) {
+				if (provider.identifier == identifier)
+					return provider;
+			}
+			
+			return null;
+		}
+		
+		/**
+		 * Gets all providers for a specific identifier
+		 * 
+		 * Params:
+		 * 		identifier	=	The name of the provider
+		 * 
+		 * Return:
+		 * 		A list of provider identifiers for an identifier
+		 */
+		string[] providersForIdentifier(string identifier) {
+			string[] ret;
+			
+			foreach(provider; providers) {
+				if (provider.hasIdentifier(identifier))
+					ret ~= provider.identifier;
+			}
+			
+			return ret;
+		}
 	}
 }

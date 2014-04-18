@@ -1,7 +1,6 @@
 module cmsed.user.operations;
-import cmsed.user.models.user;
-import cmsed.user.models.userauth;
-import cmsed.user.models.usergroup;
+import cmsed.user;
+import cmsed.user.models;
 import cmsed.user.registration.auth;
 import cmsed.base.defs;
 
@@ -29,7 +28,7 @@ UserModel getLoggedInUser() {
  * 		password = 	The password given. Secret info to identifiy is the user.
  */
 bool login(string userName, string password) {
-	UserModel um = getUserFromAuth(userName, password);
+	UserModel um = checker.validCredentials(userName, password);
 	if (um is null) return false;
 	
 	session["userId"] = um.key.key;
@@ -40,7 +39,7 @@ bool login(string userName, string password) {
  * Check if the username exists in any of the providers.
  */
 bool doesUserExist(string name) {
-	return getCheckUserExistsFromAuth(name);
+	return checker.hasIdentifier(name);
 }
 
 /**
@@ -65,15 +64,23 @@ void logout() {
 }
 
 private {
-	shared static this() {
-		UserModel dbAuthProvider(string user, string pass) {
+	class ModelAuthProvider : AuthProvider {
+		bool hasIdentifier(string identifier) {
+			size_t uam = UserAuthModel.query()
+				.username_eq(identifier)
+					.count();
+			
+			return (uam > 0);
+		}
+		
+		UserModel validCredentials(string identifier, string validator) {
 			UserAuthModel[] uams = UserAuthModel.query()
-				.username_eq(user).find();
+				.username_eq(identifier).find();
 			
 			foreach(uam; uams) {
-				if (uam.password == pass) {
+				if (uam.password == validator) {
 					if (uam.password.needsToBeUpgraded) {
-						uam.password = pass;
+						uam.password = validator;
 						uam.save();
 					}
 					return uam.user.getUser();
@@ -83,16 +90,20 @@ private {
 			return null;
 		}
 		
-		registerAuthProvider(&dbAuthProvider);
-		
-		bool dbAuthCheckProvider(string user) {
-			size_t uam = UserAuthModel.query()
-				.username_eq(user)
-					.count();
-			
-			return (uam > 0);
+		bool changeValidator(string identifier, string validator) {
+			return false;
 		}
 		
-		registerUserExistsProvider(&dbAuthCheckProvider);
+		@property string identifier() {
+			return BUILT_IN_DB_AUTH;
+		}
+		
+		void logLogin(string identifier) {
+			// this may be a good idea to do something with.
+		}
+	}
+	
+	shared static this() {
+		registerAuthProvider!ModelAuthProvider;
 	}
 }
