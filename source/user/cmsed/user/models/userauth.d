@@ -1,5 +1,5 @@
 module cmsed.user.models.userauth;
-public import cmsed.user.models.user : UserModel, UserIdModel;
+import cmsed.user.models.user;
 import cmsed.base.util;
 import cmsed.base.defs;
 import dvorm;
@@ -21,7 +21,7 @@ class UserAuthModel {
 		 * 		UserModel, UserIdModel
 		 */
 		@dbName("")
-		UserIdModel user = new UserIdModel;
+		UserIdModel user;
 		
 		/**
 		 * The username/email to identify for.

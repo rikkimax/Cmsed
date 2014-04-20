@@ -22,7 +22,7 @@ class UserModel {
 	 */
 	@dbId
 	@dbName("")
-	UserIdModel key = new UserIdModel;
+	UserIdModel key;
 	
 	/**
 	 * The name of the user.
@@ -37,7 +37,7 @@ class UserModel {
 	 * 		assert(name.first == "richard")
 	 * 		assert(name.last == "cattermole")
 	 */
-	NameModel name = new NameModel;
+	NameModel name;
 	
 	/**
 	 * UTC0 time in unix form of when the user was born.
@@ -81,7 +81,7 @@ class UserModel {
  * See_Also:
  * 		UserModel
  */
-class UserIdModel {
+struct UserIdModel {
 	@dbId {
 		@dbName("id")
 		string key;
@@ -96,7 +96,7 @@ class UserIdModel {
 /**
  * A class that handles a name. Automatically seperates out first/middle/last.
  */
-class NameModel {
+struct NameModel {
 	@dbId {
 		/**
 		 * Persons first name.

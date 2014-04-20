@@ -1,6 +1,6 @@
 module cmsed.user.models.group;
-public import cmsed.user.models.user : UserIdModel, UserModel;
-import cmsed.user.models.usergroup;
+import cmsed.user.models.user;
+import cmsed.user.models.policy;
 import cmsed.base;
 import dvorm;
 import vbson = vibe.data.bson;
@@ -19,7 +19,7 @@ class GroupModel {
 	 */
 	@dbId
 	@dbName("")
-	GroupIdModel key = new GroupIdModel;
+	GroupIdModel key;
 	
 	/**
 	 * The title the group.
@@ -38,8 +38,9 @@ class GroupModel {
 	/**
 	 * Generates the key and sets when it was created.
 	 */
+	@dbIgnore
 	void generateKey() {
-		key.key = vbson.BsonObjectID.generate().toString();
+		key.name = vbson.BsonObjectID.generate().toString();
 		createdOn = utc0Time();
 	}
 	
@@ -48,10 +49,24 @@ class GroupModel {
 	/**
 	 * Gets all users that are a member of this group.
 	 */
+	@dbIgnore
 	UserModel[] getUsers() {
+		import cmsed.user.models.usergroup;
+		
 		UserModel[] ret;
-		foreach(ug; UserGroupModel.query().group_key_eq(key.key).find()) {
+		foreach(ug; UserGroupModel.query().group_name_eq(key.name).find()) {
 			ret ~= ug.getUser();
+		}
+		return ret;
+	}
+	
+	@dbIgnore
+	PolicyModel[] getPolicies() {
+		import cmsed.user.models.grouppolicy;
+		
+		PolicyModel[] ret;
+		foreach(pm; GroupPolicyModel.query().group_name_eq(key.name).enabled_eq(true).find()) {
+			ret ~= pm.policy.getPolicy();
 		}
 		return ret;
 	}
@@ -65,13 +80,13 @@ class GroupModel {
  * See_Also:
  * 		GroupModel
  */
-class GroupIdModel {
+struct GroupIdModel {
 	/**
 	 * The unique identifier for this group.
 	 */
 	@dbId
 	@dbName("id")
-	string key;
+	string name;
 	
 	/**
 	 * Get the group based on this key.
@@ -81,6 +96,6 @@ class GroupIdModel {
 	 */
 	@dbIgnore
 	GroupModel getGroup() {
-		return GroupModel.findOne(key);
+		return GroupModel.findOne(name);
 	}
 }

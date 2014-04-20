@@ -19,13 +19,13 @@ class UserGroupModel {
 		 * The user to be joined to
 		 */
 		@dbDefaultValue(null)
-		UserIdModel user = new UserIdModel;
+		UserIdModel user;
 		
 		/**
 		 * The group to be joined to
 		 */
 		@dbDefaultValue(null)
-		GroupIdModel group = new GroupIdModel;
+		GroupIdModel group;
 	}
 	
 	/**
@@ -71,7 +71,7 @@ class UserGroupModel {
 	 */
 	static UserGroupModel[] getByGroup(GroupModel group) {
 		return UserGroupModel.query()
-			.group_key_eq(group.key.key)
+			.group_name_eq(group.key.name)
 				.find();
 	}
 }

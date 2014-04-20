@@ -42,7 +42,7 @@ bool isUserInGroup(string group) {
 	UserGroupModel[] ugma = UserGroupModel.getByUser(getLoggedInUser());
 	foreach(ugm; ugma) {
 		GroupModel gm = ugm.getGroup();
-		if (gm.key.key == group) return true;
+		if (gm.key.name == group) return true;
 		else if (gm.title == group) return true;
 	}
 	

@@ -1,6 +1,7 @@
 module cmsed.test.routes.test;
 import cmsed.base;
 import cmsed.test.models;
+import cmsed.user;
 import vibe.d : Json;
 
 @jsRouteName("test_route")
