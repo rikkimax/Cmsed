@@ -1,8 +1,13 @@
 ﻿module cmsed.user.models.policy;
 import cmsed.user.models.group;
+import cmsed.base;
 import dvorm;
 
+/**
+ * A policy which is to be applied to a user(s)
+ */
 @dbName("Policy")
+@shouldNotGenerateJavascriptModel
 class PolicyModel {
 	@dbId {
 		@dbName("")

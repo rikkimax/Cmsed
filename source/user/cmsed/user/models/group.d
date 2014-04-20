@@ -48,6 +48,9 @@ class GroupModel {
 	
 	/**
 	 * Gets all users that are a member of this group.
+	 * 
+	 * Returns:
+	 * 		The users in the group
 	 */
 	@dbIgnore
 	UserModel[] getUsers() {
@@ -60,6 +63,12 @@ class GroupModel {
 		return ret;
 	}
 	
+	/**
+	 * Gets all the policies which apply to this group.
+	 * 
+	 * Returns:
+	 * 		All the policies for this group
+	 */
 	@dbIgnore
 	PolicyModel[] getPolicies() {
 		import cmsed.user.models.grouppolicy;

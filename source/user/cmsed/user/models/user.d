@@ -1,8 +1,7 @@
 module cmsed.user.models.user;
 import cmsed.user.models.group;
 import cmsed.user.models.policy;
-import cmsed.base.util;
-import cmsed.base.defs;
+import cmsed.base;
 import dvorm;
 import vbson = vibe.data.bson;
 import std.string : split;
@@ -75,6 +74,12 @@ class UserModel {
 		return ret;
 	}
 	
+	/**
+	 * Gets the policies applied to this user.
+	 * 
+	 * Return:
+	 * 		The policies applied to this user
+	 */
 	PolicyModel[] getPolicies() {
 		import cmsed.user.models.userpolicy;
 		
