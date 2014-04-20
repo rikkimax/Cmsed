@@ -20,7 +20,11 @@ SysTime utc0SysTime() {
 	return curr;
 }
 
-string utc0CompiledTimeStamp() {
+ulong utc0Compiled() {
+	return utc0CompiledSysTime().toUnixTime();
+}
+
+SysTime utc0CompiledSysTime() {
 	string timestamp = __TIMESTAMP__;
 	string[] values = timestamp.split(" ");
 	
@@ -30,9 +34,13 @@ string utc0CompiledTimeStamp() {
 	timeo ~= values[2] ~ " ";
 	timeo ~= values[3];
 	
-	SysTime time = SysTime.fromSimpleString(timeo);
-	auto durr = Clock.currTime().utcOffset;
-	time -= durr;
+	SysTime curr = SysTime.fromSimpleString(timeo);
+	curr -= curr.utcOffset;
+	return curr;
+}
+
+string utc0CompiledTimeStamp() {
+	auto time = utc0CompiledSysTime();
 	
 	string dayOfWeek = to!string(time.dayOfWeek);
 	string month = to!string(time.month);
@@ -210,5 +218,41 @@ in {
 		ret ~= hexValue(s[1]);
 		ret ~= hexValue(s[2]);
 	}
+	return ret;
+}
+
+/**
+ * Caches network information
+ */
+
+@property string hostname() {
+	static string ret;
+	
+	if (ret is null) {
+		import std.socket : Socket;
+		ret = Socket.hostName();
+	}
+	
+	return ret;
+}
+
+@property string[] ips() {
+	static string[] ret;
+	
+	if (ret.length == 0) {
+		import std.socket : getAddress;
+		foreach(address; getAddress(hostname)) {
+			string addr = address.toAddrString();
+			switch(addr) {
+				case "127.0.0.1":
+				case "::1":
+					break;
+				default:
+					ret ~= addr;
+					break;
+			}
+		}
+	}
+	
 	return ret;
 }

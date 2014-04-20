@@ -1,6 +1,7 @@
 module cmsed.base.registration.update;
 import cmsed.base.util;
 import cmsed.base.internal.config : hasConfigurationChanged;
+import cmsed.base.internal.nodes;
 import cmsed.base.timezones : rebuildTimeZones;
 import vibe.core.core : exitEventLoop, runTask, sleep, setTaskEventCallback, TaskEvent;
 import vibe.core.driver : getEventDriver;
@@ -114,6 +115,9 @@ private {
 		synchronized {
 			// if configuration has changed set to should be reconfigured.
 			shouldReconfigure = hasConfigurationChanged();
+			
+			// cmsed base stuff
+			rebuildNodes(); // updates our nodes ip also remove old ones
 			
 			foreach(func; updateFrequentFuncs) {
 				func();

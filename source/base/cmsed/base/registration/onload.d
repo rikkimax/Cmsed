@@ -2,6 +2,7 @@ module cmsed.base.registration.onload;
 import cmsed.base.registration.model;
 import cmsed.base.registration.routes;
 import cmsed.base.internal.registration.staticfiles;
+import cmsed.base.internal.nodes;
 
 /**
  * Registers functions to be executed pre update registration and listening.
@@ -33,6 +34,7 @@ void registerOnLoad(runOnLoadFunc func) {
 void runOnLoad(bool isInstall) {
 	synchronized {
 		configureModels();
+		configureNodes();
 		
 		foreach(func; runOnLoadFuncs) {
 			func(isInstall);

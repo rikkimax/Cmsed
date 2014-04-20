@@ -27,7 +27,7 @@ version(ExcludeCmsedMain) {
 	int main(string[] args) {
 		bool runForever;
 		bool isInstallMode;
-        string mode;
+		string mode;
 		
 		int retHelpValue = handleHelp(runForever, isInstallMode, mode);
 		if (retHelpValue < 0) return retHelpValue;
