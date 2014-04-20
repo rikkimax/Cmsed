@@ -1,6 +1,6 @@
 module cmsed.user.models.user;
 import cmsed.user.models.group;
-import cmsed.user.models.usergroup;
+import cmsed.user.models.policy;
 import cmsed.base.util;
 import cmsed.base.defs;
 import dvorm;
@@ -53,7 +53,7 @@ class UserModel {
 	 * Generats the key and sets when the user joined.
 	 */
 	void generateKey() {
-		key.key = vbson.BsonObjectID.generate().toString();
+		key.name = vbson.BsonObjectID.generate().toString();
 		createdOn = utc0Time();
 	}
 	
@@ -66,9 +66,21 @@ class UserModel {
 	 * 		GroupModel
 	 */
 	GroupModel[] getGroups() {
+		import cmsed.user.models.usergroup;
+		
 		GroupModel[] ret;
-		foreach(ug; UserGroupModel.query().user_key_eq(key.key).find()) {
+		foreach(ug; UserGroupModel.query().user_name_eq(key.name).find()) {
 			ret ~= ug.getGroup();
+		}
+		return ret;
+	}
+	
+	PolicyModel[] getPolicies() {
+		import cmsed.user.models.userpolicy;
+		
+		PolicyModel[] ret;
+		foreach(pm; UserPolicyModel.query().user_name_eq(key.name).enabled_eq(true).find()) {
+			ret ~= pm.getPolicy();
 		}
 		return ret;
 	}
@@ -84,12 +96,12 @@ class UserModel {
 struct UserIdModel {
 	@dbId {
 		@dbName("id")
-		string key;
+		string name;
 	}
 	
 	@dbIgnore
 	UserModel getUser() {
-		return UserModel.findOne(key);
+		return UserModel.findOne(name);
 	}
 }
 

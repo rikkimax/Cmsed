@@ -31,7 +31,7 @@ bool login(string userName, string password) {
 	UserModel um = checker.validCredentials(userName, password);
 	if (um is null) return false;
 	
-	session["userId"] = um.key.key;
+	session["userId"] = um.key.name;
 	return true;
 }
 

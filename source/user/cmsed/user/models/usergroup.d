@@ -62,7 +62,7 @@ class UserGroupModel {
 	 */
 	static UserGroupModel[] getByUser(UserModel user) {
 		return UserGroupModel.query()
-			.user_key_eq(user.key.key)
+			.user_name_eq(user.key.name)
 				.find();
 	}
 	
