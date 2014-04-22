@@ -30,7 +30,7 @@ mixin template CacheManager(T, string getName = "get", bool frequent = false) if
 		}});
 	
 	mixin(q{
-		static this() {
+		shared static this() {
 			import cmsed.base.registration.update;
 			
 			registerUpdate(&mixin(getName ~ "Update"), frequent);
