@@ -16,6 +16,8 @@ class Test : OORoute {
 		return true;
 	}
 	
+	mixin TemplatedRoute!("/myindex2", "index");
+	
 	@RouteGroup(null, "/.svc") {
 		mixin RestfulRoute!(RestfulProtection.All, Book3, Page3);
 	}

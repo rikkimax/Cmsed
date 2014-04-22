@@ -1,10 +1,10 @@
 module cmsed.base.internal.routing.defs;
 import cmsed.base.internal.config : configuration;
 import cmsed.base.internal.routing.parser;
+import cmsed.base.util : split, replace;
 public import vibe.d : HTTPServerRequest, HTTPServerResponse, URLRouter, Session, HTTPServerRequestHandler, HTTPStatus, HTTPMethod, httpStatusText;
 
 import std.string : toLower;
-import cmsed.base.util : split;
 import std.file : append;
 import std.path : buildPath;
 import std.conv : to;
@@ -116,6 +116,21 @@ struct RouteErrorHandler {
 interface OORoute {}
 interface OOInstallRoute {}
 interface OOAnyRoute {}
+
+/**
+ * Template to provide a function that only renders a template
+ * 
+ * Params:
+ * 		templ		= The template to render
+ * 		path 		= The path to give the template. Default: ""
+ * 		funcname	= The function name to generate for. Default: Based upon the template and path given
+ */
+mixin template TemplatedRoute(string templ, string path = "",
+                              string funcname = "templatedRoute" ~ templ ~ path.replace(":", "").replace("/", "").replace("*", "")) {
+	
+	@RouteFunction(RouteType.Get, path, templ)
+	mixin("bool " ~ funcname ~ "() { return true; }\n");
+}
 
 private {
 	__gshared CTFEURLRouter urlRouter_;
