@@ -1,1 +1,2 @@
 include cmsed_base_widget
+include cmsed_base_i18n

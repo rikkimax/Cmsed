@@ -9,3 +9,6 @@ html
         - foreach(wr; getWidgetRoutes())
             = wr.file ~ " " ~ wr.name ~ " " ~ wr.position ~ " " ~ wr.widgetInfo ~ wr.routeInfo.classModuleName ~ "." ~ wr.routeInfo.className ~ "." ~ wr.routeInfo.functionName ~ " = " ~ wr.routeInfo.type ~ ":" ~ wr.routeInfo.path
             br
+        
+        - i18nFile!"test.ini";
+        = "Site: " ~ i18n("name")

@@ -39,7 +39,8 @@
 				"dvorm": "~master",
 				"dvorm:email": "~master",
 				"dvorm:vibeproviders": "~master",
-				"cmsed:minifier": "~master"
+				"cmsed:minifier": "~master",
+				"ctini": "~master"
 			}
 		},
 		{
