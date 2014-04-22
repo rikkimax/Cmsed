@@ -126,7 +126,7 @@ interface OOAnyRoute {}
  * 		funcname	= The function name to generate for. Default: Based upon the template and path given
  */
 mixin template TemplatedRoute(string templ, string path = "",
-                              string funcname = "templatedRoute" ~ templ ~ path.replace(":", "").replace("/", "").replace("*", "")) {
+                              string funcname = "templatedRoute" ~ templ ~ (path.replace(":", "").replace("/", "").replace("*", ""))) {
 	
 	@RouteFunction(RouteType.Get, path, templ)
 	mixin("bool " ~ funcname ~ "() { return true; }\n");
