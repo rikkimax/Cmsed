@@ -27,13 +27,7 @@ class PolicyModel {
 	@dbIgnore
 	@property GroupModel[] getGroups() {
 		import cmsed.user.models.grouppolicy;
-		
-		GroupModel[] models;
-		foreach(groupP; GroupPolicyModel.query().policy_name_eq(key.name).enabled_eq(true).find()) {
-			models ~= groupP.group.getGroup();
-		}
-		
-		return models;
+		return  GroupPolicyModel.query().policy_name_eq(key.name).enabled_eq(true).find_by_group();
 	}
 }
 

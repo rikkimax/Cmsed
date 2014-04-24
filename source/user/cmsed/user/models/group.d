@@ -55,12 +55,7 @@ class GroupModel {
 	@dbIgnore
 	UserModel[] getUsers() {
 		import cmsed.user.models.usergroup;
-		
-		UserModel[] ret;
-		foreach(ug; UserGroupModel.query().group_name_eq(key.name).find()) {
-			ret ~= ug.getUser();
-		}
-		return ret;
+		return UserGroupModel.query().group_name_eq(key.name).find_by_user();
 	}
 	
 	/**
@@ -72,12 +67,7 @@ class GroupModel {
 	@dbIgnore
 	PolicyModel[] getPolicies() {
 		import cmsed.user.models.grouppolicy;
-		
-		PolicyModel[] ret;
-		foreach(pm; GroupPolicyModel.query().group_name_eq(key.name).enabled_eq(true).find()) {
-			ret ~= pm.policy.getPolicy();
-		}
-		return ret;
+		return GroupPolicyModel.query().group_name_eq(key.name).enabled_eq(true).find_by_policy();
 	}
 }
 

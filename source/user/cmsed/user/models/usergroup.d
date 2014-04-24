@@ -19,12 +19,14 @@ class UserGroupModel {
 		 * The user to be joined to
 		 */
 		@dbDefaultValue(null)
+		@dbActualModel!(UserModel, "key")
 		UserIdModel user;
 		
 		/**
 		 * The group to be joined to
 		 */
 		@dbDefaultValue(null)
+		@dbActualModel!(GroupModel, "key")
 		GroupIdModel group;
 	}
 	

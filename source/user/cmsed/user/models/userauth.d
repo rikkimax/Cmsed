@@ -21,6 +21,7 @@ class UserAuthModel {
 		 * 		UserModel, UserIdModel
 		 */
 		@dbName("")
+		@dbActualModel!(UserModel, "key")
 		UserIdModel user;
 		
 		/**
