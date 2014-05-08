@@ -94,6 +94,8 @@ void delegate() getFuncOfRoute(T, string m, T t = new T)() {
 			if (!http_response.headerWritten) {
 				http_response.writeJsonBody(mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")"));
 			}
+		} else static if (is(ReturnType!(mixin("t." ~ m)) : IRouterReturnable)) {
+			mixin("t." ~ m)().handleReturn();
 		} else static if (isSomeString!(ReturnType!(mixin("t." ~ m)))) {
 			if (!http_response.headerWritten) {
 				http_response.writeBody(mixin("t." ~ m ~ "(" ~ paramsGot!(T, m) ~ ")"));

@@ -118,6 +118,14 @@ interface OOInstallRoute {}
 interface OOAnyRoute {}
 
 /**
+ * Allows for returning of data
+ */
+interface IRouterReturnable {
+	
+	void handleReturn();
+}
+
+/**
  * Template to provide a function that only renders a template
  * 
  * Params:
