@@ -1,8 +1,9 @@
 module cmsed.test.models;
-import cmsed.base.registration.model;
-import cmsed.base.registration.onload;
+import cmsed.base;
 
 public import cmsed.test.models.book;
+
+mixin CacheQuery!(Book3, q{Book3.query().edition_eq(8)}, "getBooks");
 
 shared static this() {
 	registerModel!Book3;

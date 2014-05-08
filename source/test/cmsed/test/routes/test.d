@@ -38,4 +38,7 @@ class Test : OORoute {
 		ret["Hello"] = Json("World!");
 		return ret;
 	}
+	
+	@RouteFunction(RouteType.Get, "/myrss")
+	auto myRss() {return new RssChannel!Book3([RssCE.Title : "All of my books"]);}
 }

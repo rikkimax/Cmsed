@@ -1,11 +1,21 @@
 module cmsed.test.models.book;
+import cmsed.test.models;
 import cmsed.base;
 import dvorm;
 
+string bookLink(Book3 book) {
+	return "/mybook/" ~ book.key.isbn;
+}
+
 @dbName("Books3")
+@rssProvider!getBooks()
+@rss(RssField.Author, "Me, myself and I")
+@rssValue!bookLink(RssField.Link)
+@rssValue!((Book3 book) => {return "some new book here!";})(RssField.Description)
 class Book3 {
 	@dbId
 	@dbName("")
+	@rss(RssField.Title)
 	Book3Id key = new Book3Id;
 	
 	@dbDefaultValue("0")
