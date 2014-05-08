@@ -1423,7 +1423,8 @@ immutable mimeTypes = [
     "vnd.sealed.swf",
     "vnd.sealedmedia.softseal.mov",
     "vnd.uvvu.mp4",
-    "vnd.vivo"
+    "vnd.vivo",
+    "rss"
 ];
 immutable mimeTemplates = [
     "application/1d-interleaved-parityfec",
@@ -2828,7 +2829,8 @@ immutable mimeTemplates = [
     "video/vnd.sealed-swf",
     "video/vnd.sealedmedia.softseal-mov",
     "video/vnd.uvvu-mp4",
-    "video/vnd-vivo"
+    "video/vnd-vivo",
+    "application/rss+xml"
 ];
 immutable mimeExtensionNames = [
     "javascript"

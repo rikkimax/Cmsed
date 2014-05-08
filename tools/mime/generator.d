@@ -31,7 +31,7 @@ void main(string[] args) {
 	extensionNames ~= "immutable mimeExtensionNames = [\n";
 	extensions ~= "immutable mimeExtensions = [\n";
 	
-	foreach (file; ["application", "audio", "image", "model", "multipart", "text", "video"]) {
+	foreach (file; ["application", "audio", "image", "model", "multipart", "text", "video", "cmsed_mime_types"]) {
 		foreach(i, string line; readText(file ~ ".csv").splitLines()) {
 			if (i == 0) continue;
 			
