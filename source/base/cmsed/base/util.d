@@ -25,13 +25,17 @@ ulong utc0Compiled() {
 }
 
 SysTime utc0CompiledSysTime() {
-	string timestamp = __TIMESTAMP__;
+	string timestamp = __TIMESTAMP__.replace("  ", " ");
 	string[] values = timestamp.split(" ");
 	
 	string timeo;
 	timeo ~= values[4] ~ "-";
 	timeo ~= values[1] ~ "-";
+	
+	if (values[2].length == 1)
+		timeo ~= "0";
 	timeo ~= values[2] ~ " ";
+	
 	timeo ~= values[3];
 	
 	SysTime curr = SysTime.fromSimpleString(timeo);
