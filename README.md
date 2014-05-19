@@ -18,8 +18,8 @@ Features:
 
 Build status:
 -------------
-- Cmsed:base [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/)
-- Cmsed:test [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/)
+__Cmsed:base__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/)<br/>
+__Cmsed:test__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/)
 
 Examples:
 ---------
