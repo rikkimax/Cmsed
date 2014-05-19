@@ -16,6 +16,11 @@ Features:
 - Logging of all routes, widgets, data models, access.
 - Can be executed in automatic reload mode. Utilising a command argument. For use in production environement where having it able to be reconfigured and rebooted on error is required.
 
+Build status:
+-------------
+- Cmsed:base [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/)
+- Cmsed:test [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/)
+
 Examples:
 ---------
 
