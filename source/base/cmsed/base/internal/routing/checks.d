@@ -5,9 +5,7 @@ import std.conv : to;
 import std.traits : ParameterTypeTuple, ParameterIdentifierTuple, isBasicType, ReturnType;
 
 pure RouteType getRouteTypeFromMethod(C, string f)() {
-	C c = new C;
-	
-	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+	foreach(UDA; __traits(getAttributes, mixin("C." ~ f))) {
 		static if (__traits(compiles, {RouteFunction rf = UDA; } )) {
 			return UDA.type;
 		}
@@ -47,10 +45,8 @@ pure bool useRenderOptionalFunc(C, string f)() {
 }
 
 pure string getPathFromMethod(C, string f)() {
-	C c = new C;
-	
 	string ret;
-	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+	foreach(UDA; __traits(getAttributes, mixin("C." ~ f))) {
 		static if (__traits(compiles, {RouteFunction rf = UDA; } )) {
 			static if (UDA.route != "")
 				ret ~= UDA.route;
@@ -101,9 +97,7 @@ pure bool hasFilters(C, string f)() {
 }
 
 pure bool isRoute(C, string f)() {
-	C c = new C;
-	
-	foreach(UDA; __traits(getAttributes, mixin("c." ~ f))) {
+	foreach(UDA; __traits(getAttributes, mixin("C." ~ f))) {
 		static if (__traits(compiles, {RouteFunction rf = UDA; } )) {
 			return true;
 		}
@@ -157,6 +151,9 @@ pure bool isARouteClass(T)() {
  * 		/static/path/*
  * 		/static/path/:myparam/:myparam2
  * 		/static/path/:myparam/*
+ * 
+ * TODO:
+ * 		Arguments can be in any position. Aka /myurl/?q=:keyword&r=:something
  */
 pure string handleCheckofRoute(T, string m, RouteType type, string path, T t = new T)() {
 	string ret;

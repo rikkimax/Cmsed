@@ -41,4 +41,14 @@ class Test : OORoute {
 	
 	@RouteFunction(RouteType.Get, "/myrss")
 	auto myRss() {return new RssChannel!Book3([RssCE.Title : "All of my books"]);}
+	
+	@RouteFunction(RouteType.Get, "/google")
+	string searchGoogle() {
+		interface GoogleAPI : OORoute {
+			@RouteFunction(RouteType.Get, "/?q=Cmsed")
+			string search_cmsed();
+		}
+		
+		return new RemoteAPI!GoogleAPI("https://google.com").search_cmsed();
+	}
 }

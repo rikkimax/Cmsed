@@ -9,6 +9,7 @@ public import cmsed.base.main;
 public import cmsed.base.util;
 public import cmsed.base.cache;
 public import cmsed.base.filters;
+public import cmsed.base.httpremoteapi;
 public import cmsed.base.i18n;
 
 /**
