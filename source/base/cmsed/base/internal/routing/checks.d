@@ -130,6 +130,25 @@ pure int getErrorRouteError(C, string f)() {
 	return 0;
 }
 
+pure bool isArgInPath(string path, string arg) {
+	foreach(part; path.split("/")) {
+		if (part.length > 0) {
+			switch(part[0]) {
+				case ':':
+					if (part.length > 1)
+						if (part[1 .. $] == arg)
+							return true;
+					break;
+				case '*':
+					return false;
+				default:
+					break;
+			}
+		}
+	}
+	return false;
+}
+
 /**
  * Does the given class have either, OORoute/OOInstallRoute or OOAnyRoute on it?
  */

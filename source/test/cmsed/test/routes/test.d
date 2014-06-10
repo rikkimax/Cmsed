@@ -45,10 +45,10 @@ class Test : OORoute {
 	@RouteFunction(RouteType.Get, "/google")
 	string searchGoogle() {
 		interface GoogleAPI : OORoute {
-			@RouteFunction(RouteType.Get, "/?q=Cmsed")
-			string search_cmsed();
+			@RouteFunction(RouteType.Get, "/")
+			string search(string q);
 		}
 		
-		return new RemoteAPI!GoogleAPI("https://google.com").search_cmsed();
+		return new RemoteAPI!GoogleAPI("https://google.com").search("Cmsed");
 	}
 }

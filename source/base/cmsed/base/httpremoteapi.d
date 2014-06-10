@@ -15,7 +15,6 @@ import cmsed.base.util : split;
  * 
  * TODO:
  * 		DELETE/PUT
- * 		Arguments can be in any position. Aka /myurl/?q=:keyword&r=:something
  */
 final class RemoteAPI(T) if(isARouteClass!T) {
 	private string __offsetURL;
@@ -61,11 +60,15 @@ private {
 				ret ~= "        requestHTTP(__offsetURL ~ \"";
 				
 				// add the path here to ret
-			F1: foreach(i, part; getPathFromMethod!(T, m).split("/")) {
+				size_t countOfPathArgs;
+				
+				enum path = getPathFromMethod!(T, m);
+			F1: foreach(i, part; path.split("/")) {
 					if (part.length > 0) {
 						switch(part[0]) {
 							case ':':
 								ret ~= "/\" ~ arg" ~ to!string(i) ~ " ~ \"";
+								countOfPathArgs++;
 								break;
 							case '*':
 								for (size_t j = i; j < argCount; j++) {
@@ -79,14 +82,31 @@ private {
 					}
 				}
 				
+				/*
+				 * Query Paramaters for GET requests
+				 */
+				static if (getRouteTypeFromMethod!(T, m) == RouteType.Get) {
+					string queryArgs;
+					foreach(i, arg; ParameterIdentifierTuple!func) {
+						if (!isArgInPath(path, arg)) {
+							queryArgs ~= arg ~ "=\" ~ arg" ~ to!string(i) ~ " ~ \" & ";
+						}
+					}
+					if (queryArgs.length > 0) {
+						queryArgs.length -= 3;
+						ret ~= "?" ~ queryArgs;
+					}
+				}
+				
 				ret ~= "\", (scope req) {\n";
 				static if (getRouteTypeFromMethod!(T, m) == RouteType.Post) {
 					ret ~= "            req.method = HTTPMethod.POST;\n";
 					ret ~= "            req.writeJsonBody([";
 					
 					// add the arguments to the function with names.
-					foreach(i, a; ParameterIdentifierTuple!func) {
-						ret ~= "\"" ~ a ~ "\": arg" ~ to!string(i) ~ ", ";
+					foreach(i, arg; ParameterIdentifierTuple!func) {
+						if (!isArgInPath(path, arg))
+							ret ~= "\"" ~ arg ~ "\": arg" ~ to!string(i) ~ ", ";
 					}
 					if (ret[$-2] == ',')
 						ret.length -= 2;
