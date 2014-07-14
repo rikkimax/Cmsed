@@ -1,7 +1,7 @@
 # Simple skeleton descriptor
 
 mkdir deps
-dlfile deps/package.json skeleton/package.json
+dlfile deps/package.json package.json
 
 mkdir dynamic/bin
 mkdir dynamic/config
