@@ -11,6 +11,19 @@
     "targetPath": "bin/liball",
     "subPackages": [
 		{
+			"name": "livereload",
+			"sourcePaths": ["source/livereload/cmsed"],
+			"importPaths": ["source/livereload"],
+			"dependencies": {
+				"dakka": ">=0.0.1",
+				"vibe-d": ">=0.7.20"
+			},
+			"versions": ["VibeCustomMain"],
+			"mainSourceFile": "source/livereload/cmsed/livereload/app.d",
+			"targetType": "executable",
+			"targetPath": "bin/base"
+		},
+		{
 			"name": "base",
 			"sourcePaths": ["source/base/cmsed"],
 			"importPaths": [
