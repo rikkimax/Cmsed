@@ -1,3 +1,5 @@
+# Simple skeleton descriptor
+
 mkdir deps
 dlfile deps/package.json skeleton/package.json
 
