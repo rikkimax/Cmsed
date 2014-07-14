@@ -1,0 +1,29 @@
+{
+	"name": "deps",
+	"sourcePaths": [],
+	"targetType": "library",
+	"targetPath": "bin",
+	"dflags": ["-Hdimports"]
+	
+    "dependencies": {
+		"vibe-d": ">=0.7.20"
+    },
+	"versions": [],
+	
+    "subPackages": [
+		{
+			"name" : "static",
+			
+			"dependencies": {
+			},
+			"versions": ["CmsedStaticBuilt"]
+		},
+		{
+			"name" : "dynamic",
+			
+			"dependencies": {
+			},
+			"versions": ["CmsedDynamicBuilt"],
+		}
+	]
+}
