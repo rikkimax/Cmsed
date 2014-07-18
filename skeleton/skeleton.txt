@@ -1,9 +1,9 @@
 # Simple skeleton descriptor
 
+mkdir bin
 mkdir deps
 dlfile deps/package.json package.json
 
-mkdir dynamic/bin
 mkdir dynamic/config
 mkdir dynamic/models
 mkdir dynamic/public
@@ -11,7 +11,6 @@ mkdir dynamic/routes
 mkdir dynamic/templates
 mkdir dynamic/caches
 
-mkdir static/bin
 mkdir static/config
 mkdir static/models
 mkdir static/public
