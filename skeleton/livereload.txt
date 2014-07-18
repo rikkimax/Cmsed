@@ -7,15 +7,19 @@ output_dir: bin
 
 dir_dependencies:
 	dynamic/routes/.*\.d
-		dynamic/caches/.*
+		dynamic/caches/.*\.d
 		dynamic/templates/.*
-		dynamic/public/.*
-		dynamic/models/.*
+		dynamic/models/.*\.d
 		dynamic/config/.*
+		static/caches/.*\.d
+		static/templates/.*
+		static/models/.*\.d
 
 grab_dependency_from_output:
 	template = dynamic/templates/.*
-	datamodel = dynamic/models/.*
+	datamodel = dynamic/models/.*\.d
+	template = static/templates/.*
+	datamodel = static/models/.*\.d
 	
 dir_with_version: LiveReloadDynamicLoad dynamic/.*
 dir_with_version: LiveReloadStaticLoad static/.*
