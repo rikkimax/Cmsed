@@ -11,5 +11,5 @@ dir_dependencies:
 		dynamic/config/.*
 
 grab_dependency_from_output:
-	dynamic/templates/.*
-	dynamic/models/.*
+	template	dynamic/templates/.*
+	datamodel	dynamic/models/.*
