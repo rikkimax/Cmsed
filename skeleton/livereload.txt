@@ -1,6 +1,9 @@
+# live reload config
+
 dub_dependency_dir: deps
 code_unit: dynamic/routes/.*\.d
 code_unit: static/
+output_dir: bin
 
 dir_dependencies:
 	dynamic/routes/.*\.d
@@ -11,5 +14,5 @@ dir_dependencies:
 		dynamic/config/.*
 
 grab_dependency_from_output:
-	template	dynamic/templates/.*
-	datamodel	dynamic/models/.*
+	template = dynamic/templates/.*
+	datamodel = dynamic/models/.*
