@@ -1,5 +1,7 @@
 # Simple skeleton descriptor
 
+dlfile livereload.txt livereload.txt
+
 mkdir bin
 mkdir deps
 dlfile deps/package.json package.json

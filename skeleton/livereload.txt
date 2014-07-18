@@ -1,0 +1,15 @@
+dub_dependency_dir: deps
+code_unit: dynamic/routes/.*\.d
+code_unit: static/
+
+dir_dependencies:
+	dynamic/routes/.*\.d
+		dynamic/caches/.*
+		dynamic/templates/.*
+		dynamic/public/.*
+		dynamic/models/.*
+		dynamic/config/.*
+
+grab_dependency_from_output:
+	dynamic/templates/.*
+	dynamic/models/.*
