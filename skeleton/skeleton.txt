@@ -4,8 +4,10 @@ dlfile livereload.txt livereload.txt
 
 mkdir bin
 mkdir deps
+mkdir deps/imports
 dlfile deps/package.json package.json
 
+mkdir deps/imports/dynamic
 mkdir dynamic/config
 mkdir dynamic/models
 mkdir dynamic/public
@@ -13,6 +15,7 @@ mkdir dynamic/routes
 mkdir dynamic/templates
 mkdir dynamic/caches
 
+mkdir deps/imports/static
 mkdir static/config
 mkdir static/models
 mkdir static/public
