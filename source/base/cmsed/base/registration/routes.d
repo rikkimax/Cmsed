@@ -1,8 +1,11 @@
-module cmsed.base.registration.routes;
-import cmsed.base.registration.widgetroute;
-import cmsed.base.internal.config;
-import cmsed.base.internal.routing;
-import cmsed.base.internal.generators.js.routes.defs;
+﻿module cmsed.base.registration.routes;
+import cmsed.base.routing.defs;
+import cmsed.base.config;
+import cmsed.base.internal.routing.class_parser;
+import cmsed.base.internal.routing.class_checks;
+import cmsed.base.internal.routing.function_parser;
+import cmsed.base.internal.routing.function_checks;
+//TODO: import cmsed.base.internal.generators.js.routes.defs;
 import std.file : write;
 
 /**
@@ -10,26 +13,37 @@ import std.file : write;
  */
 
 private shared {
-	alias void function() configureRouteFunc;
-	
-	configureRouteFunc[] configureRouteFuncs;
-	configureRouteFunc[] configureInstallRouteFuncs;
+    alias void function() configureRouteFunc;
+    
+    configureRouteFunc[] configureRouteFuncs;
+    configureRouteFunc[] configureInstallRouteFuncs;
 }
 
 /**
- * Registers a route class to be listend for when in production mode.
+ * Registers a route class
  */
-void registerRoute(C)() {
-	synchronized {
-		static if (is(C : OORoute) || is(C : OOAnyRoute)) {
-			configureRouteFuncs ~= &registerRouteHandler!C;
-		}
-		static if (is(C : OOInstallRoute) || is(C : OOAnyRoute)) {
-			configureInstallRouteFuncs ~= &registerRouteHandler!C;
-		}
-		
-		generateJavascriptRoute!C;
-	}
+void registerRoute(C)() if (isARouteClass!C) {
+    synchronized {
+        static if (is(C : OORoute) || is(C : OOAnyRoute)) {
+            configureRouteFuncs ~= &registerRouteHandler!C;
+        }
+        static if (is(C : OOInstallRoute) || is(C : OOAnyRoute)) {
+            configureInstallRouteFuncs ~= &registerRouteHandler!C;
+        }
+        
+        //TODO: generateJavascriptRoute!C;
+    }
+}
+
+/**
+ * Registers a route (free function)
+ */
+void registerRoute(alias SYMBL, string file)() if (isARouteFunction!SYMBL) {
+    synchronized {
+        configureRouteFuncs ~= &registerRouteHandler!(SYMBL, file);
+        
+        //TODO: generateJavascriptRoute!SYMBL;
+    }
 }
 
 /**
@@ -38,14 +52,12 @@ void registerRoute(C)() {
  */
 
 void configureRoutes(bool isInstall) {
-	synchronized {
-		string ofile = buildPath(configuration.logging.dir, configuration.logging.routeFile);
-		write(ofile,"");
-		
-		foreach(func; isInstall ? configureInstallRouteFuncs : configureRouteFuncs) {
-			func();
-		}
-		
-		outputWidgets();
-	}
+    synchronized {
+        string ofile = buildPath(configuration.logging.dir, configuration.logging.routeFile);
+        write(ofile,"");
+        
+        foreach(func; isInstall ? configureInstallRouteFuncs : configureRouteFuncs) {
+            func();
+        }
+    }
 }

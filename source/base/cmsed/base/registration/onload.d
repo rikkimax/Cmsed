@@ -1,7 +1,7 @@
 module cmsed.base.registration.onload;
 import cmsed.base.registration.model;
 import cmsed.base.registration.routes;
-import cmsed.base.internal.registration.staticfiles;
+//import cmsed.base.internal.registration.staticfiles;
 import cmsed.base.internal.nodes;
 
 /**
@@ -32,6 +32,8 @@ void registerOnLoad(runOnLoadFunc func) {
  * But since no public.
  */
 void runOnLoad(bool isInstall) {
+    import dvorm.providers;
+
 	synchronized {
 		configureModels();
 		configureNodes();
@@ -41,6 +43,9 @@ void runOnLoad(bool isInstall) {
 		}
 		
 		configureRoutes(isInstall);
-		configureStaticFiles();
+		//TODO: configureStaticFiles();
+
+        import cmsed.base.registration.pipeline;
+        logOnLoad();
 	}
 }

@@ -1,5 +1,5 @@
 module cmsed.base.internal.restful.get;
-import cmsed.base.internal.restful.defs;
+import cmsed.base.restful;
 import cmsed.base.internal.routing;
 import vibe.data.json;
 import dvorm;
@@ -15,9 +15,11 @@ pure string getRestfulData(TYPE)() {
 	ret ~= """
 #line 1 \"cmsed.base.internal.restful.get." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Get, \"/" ~ getTableName!TYPE ~ "/:key\")
-void handleRestfulData" ~ TYPE.stringof ~ "Get() {
+Json handleRestfulData" ~ TYPE.stringof ~ "Get() {
+    import cmsed.base.internal.restful.get : outputRestfulTypeJson;
     import " ~ moduleName!TYPE ~ ";
-    auto value = " ~ TYPE.stringof ~ ".findOne(http_request.params[\"key\"]);
+
+    auto value = " ~ TYPE.stringof ~ ".findOne(currentTransport.request.params[\"key\"]);
     if (value !is null) {
         """;
 	static if (__traits(hasMember, TYPE, "canView") && typeof(&type.canView).stringof == "bool delegate()") {
@@ -33,9 +35,11 @@ void handleRestfulData" ~ TYPE.stringof ~ "Get() {
 		}
 	}
 	ret ~= """
-            http_response.writeBody(output.toString());
+            return output;
         }
     }
+
+    return Json.emptyObject;
 }
 """;
 	return ret;

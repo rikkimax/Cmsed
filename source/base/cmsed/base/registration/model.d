@@ -1,6 +1,6 @@
 module cmsed.base.registration.model;
-import cmsed.base.internal.config;
-import cmsed.base.internal.generators.js.model;
+import cmsed.base.config;
+//import cmsed.base.internal.generators.js.model;
 import dvorm.logging;
 import std.file : write;
 import std.path : buildPath;
@@ -18,12 +18,10 @@ private shared {
 	configureModelDatabasesOnInitFunc[] configureModelDatabasesOnInit;
 	
 	void configureModelDatabase(C)() {
-		C.logMe();
+        import std.traits : fullyQualifiedName;
+        C.logMe();
 		
-		string clasz = C.stringof;
-		shared Database db = configuration.modelDatabases.get(clasz, null);
-		if (db is Database.init)
-			db = configuration.globalDatabase;
+        Database db = configuration.modelDatabases.get(__traits(identifier, C), configuration.modelDatabases.get(fullyQualifiedName!C, configuration.globalDatabase));
 		
 		C.databaseConnection(db.getDbConnections());
 	}
@@ -33,7 +31,9 @@ private shared {
  * Registers a dvorm data model.
  * To be configured and managed by Cmsed.
  */
-void registerModel(C)() {
+void registerModel(C)() if (isDataModel!C) {
+    import cmsed.base.internal.defs;
+
 	synchronized {
 		configureModelDatabases ~= &configureModelDatabase!C;
 		
@@ -41,7 +41,11 @@ void registerModel(C)() {
 			configureModelDatabasesOnInit ~= C.init();
 		}
 		
-		generateJavascriptModel!C;
+		//TODO: generateJavascriptModel!C;
+        static if (SupportsLuaTemplating) {
+            import cmsed.lua.internal.configure.datamodel;
+            configureDataModel!C;
+        }
 	}
 }
 
@@ -62,4 +66,11 @@ void configureModels() {
 		// log it
 		write(buildPath(configuration.logging.dir, configuration.logging.ormFile), getOrmLog());
 	}
+}
+
+pure bool isDataModel(T)() {
+    static if (is(T == vibe.data.json.Json))
+        return false;
+    else
+        return __traits(hasMember, T, "databaseConnection");
 }

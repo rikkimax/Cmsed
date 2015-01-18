@@ -1,9 +1,9 @@
 ﻿module cmsed.base.internal.models.nodes;
-import cmsed.base;
+import cmsed.base.util;
 import dvorm;
 
 @dbName("SystemNode")
-@shouldNotGenerateJavascriptModel
+//TODO: @shouldNotGenerateJavascriptModel
 class SystemNodesModel {
 	@dbId
 	@dbName("host")
@@ -59,7 +59,7 @@ struct SystemNodeId {
 }
 
 @dbName("SystemNodeIp")
-@shouldNotGenerateJavascriptModel
+//TODO: @shouldNotGenerateJavascriptModel
 class SystemNodeIpModel {
 	@dbId {
 		@dbName("host")

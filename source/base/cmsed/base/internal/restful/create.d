@@ -1,5 +1,5 @@
 module cmsed.base.internal.restful.create;
-import cmsed.base.internal.restful.defs;
+import cmsed.base.restful;
 import cmsed.base.internal.routing;
 import vibe.data.json;
 import dvorm;
@@ -15,7 +15,7 @@ pure string createRestfulData(TYPE)() {
 	ret ~= """
 #line 1 \"cmsed.base.internal.restful.create." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Put, \"/" ~ getTableName!TYPE ~ "\")
-@jsRouteParameters([" ~ valueOps!TYPE ~ "])
+@JsRouteParameters([" ~ valueOps!TYPE ~ "])
 void handleRestfulData" ~ TYPE.stringof ~ "Create() {
     import " ~ moduleName!TYPE ~ ";
     auto value = newValueOfType!" ~ TYPE.stringof ~ ";
@@ -31,13 +31,13 @@ void handleRestfulData" ~ TYPE.stringof ~ "Create() {
 						           is(typeof(mixin("type." ~ m ~ "." ~ n)) == dstring) ||
 						           is(typeof(mixin("type." ~ m ~ "." ~ n)) == wstring)) {
 							ret ~= """
-    formVal = http_request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "\", null);
+    formVal = currentTransport.request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "\", null);
     if (formVal !is null)
         value." ~ m ~ "." ~ n ~ " = cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")formVal;
 """;
 						} else static if (typeof(mixin("type." ~ m ~ "." ~ n)).stringof != "void") {
 							ret ~= """
-    formVal = http_request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "\", null);
+    formVal = currentTransport.request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "\", null);
     if (formVal !is null)
         value." ~ m ~ "." ~ n ~ " = to!(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")(formVal);
 """;
@@ -48,13 +48,13 @@ void handleRestfulData" ~ TYPE.stringof ~ "Create() {
 			                  is(typeof(mixin("type." ~ m)) == dstring) ||
 			                  is(typeof(mixin("type." ~ m)) == wstring)) {
 				ret ~= """
-    formVal = http_request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "\", null);
+    formVal = currentTransport.request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "\", null);
     if (formVal !is null)
         value." ~ m ~ " = cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")formVal;
 """;
 			} else static if (typeof(mixin("type." ~ m)).stringof != "void") {
 				ret ~= """
-    formVal = http_request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "\", null);
+    formVal = currentTransport.request.form.get(\"" ~ getNameValue!(TYPE, m) ~ "\", null);
     if (formVal !is null)
         value." ~ m ~ " = to!(" ~ typeof(mixin("type." ~ m)).stringof ~ ")(formVal);
 """;
@@ -70,7 +70,7 @@ void handleRestfulData" ~ TYPE.stringof ~ "Create() {
 	
 	ret ~= """
         value.save();
-        http_response.writeBody(\"\");
+        currentTransport.response.writeVoidBody();
     }
 """;
 	ret ~= """

@@ -10,6 +10,10 @@ import std.variant;
  */
 
 class DbSessionStore : SessionStore {
+    @property SessionStorageType storageType() const {
+        return SessionStorageType.native;
+    }
+
 	Session create() {
 		return createSessionInstance(null);
 	}
@@ -65,4 +69,13 @@ class DbSessionStore : SessionStore {
 		}
 		return &iterator;
 	}
+
+    int iterateSession(string id, scope int delegate(string key) del) {
+        foreach(ref sm; SessionModel.getSessionById(id)) {
+            if (auto ret = del(sm.name))
+                return ret;
+        }
+
+        return 0;
+    }
 }

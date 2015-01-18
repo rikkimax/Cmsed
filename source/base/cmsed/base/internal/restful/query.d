@@ -1,5 +1,5 @@
 module cmsed.base.internal.restful.query;
-import cmsed.base.internal.restful.defs;
+import cmsed.base.restful;
 import cmsed.base.internal.routing;
 import vibe.data.json;
 import dvorm;
@@ -15,8 +15,9 @@ pure string queryRestfulData(TYPE)() {
 	ret ~= """
 #line 1 \"cmsed.base.internal.restful.query." ~ TYPE.stringof ~ "\"
 @RouteFunction(RouteType.Post, \"/" ~ getTableName!TYPE ~ "\")
-@jsRouteParameters([" ~ valueOps!TYPE ~ "\"__maxAmount\", \"__offset\"])
-void handleRestfulData" ~ TYPE.stringof ~ "Query() {
+@JsRouteParameters([" ~ valueOps!TYPE ~ "\"__maxAmount\", \"__offset\"])
+Json handleRestfulData" ~ TYPE.stringof ~ "Query() {
+    import cmsed.base.internal.restful.get : outputRestfulTypeJson;
     import " ~ moduleName!TYPE ~ ";
     auto query = " ~ TYPE.stringof ~ ".query();
 
@@ -25,13 +26,13 @@ void handleRestfulData" ~ TYPE.stringof ~ "Query() {
 """;
 	
 	//maxAmount
-	ret ~= "    if (http_request.form.get(\"__maxAmount\", null) !is null)\n";
-	ret ~= "        maxAmount = to!ushort(http_request.form[\"__maxAmount\"]);\n";
+	ret ~= "    if (currentTransport.request.form.get(\"__maxAmount\", null) !is null)\n";
+    ret ~= "        maxAmount = to!ushort(currentTransport.request.form[\"__maxAmount\"]);\n";
 	ret ~= "    if (maxAmount > 100) maxAmount = 10;\n";
 	ret ~= "    query.maxAmount(maxAmount);\n";
 	//startAt
-	ret ~= "    if (\"__offset\" in http_request.form)\n";
-	ret ~= "        offset = to!ushort(http_request.form[\"__offset\"]);\n";
+    ret ~= "    if (\"__offset\" in currentTransport.request.form)\n";
+    ret ~= "        offset = to!ushort(currentTransport.request.form[\"__offset\"]);\n";
 	ret ~= "    query.startAt(offset);\n";
 	
 	ret ~= "\n";
@@ -73,7 +74,7 @@ void handleRestfulData" ~ TYPE.stringof ~ "Query() {
     output[\"maxAmount\"] = maxAmount;
     output[\"offset\"] = offset;
 
-    http_response.writeBody(output.toString());
+    return output;
 }
 """;
 	
@@ -93,47 +94,47 @@ private {
 						static if (is(typeof(mixin("type." ~ m ~ "." ~ n)) == string) ||
 						           is(typeof(mixin("type." ~ m ~ "." ~ n)) == dstring) ||
 						           is(typeof(mixin("type." ~ m ~ "." ~ n)) == wstring)) {
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_eq(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_eq(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_neq(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_neq(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mt(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mt(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lt(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lt(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mte(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mte(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lte(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lte(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\"]);\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_like(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\"]);\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_like(cast(" ~ typeof(mixin("type." ~ m ~ "." ~ n)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\"]);\n";
 						} else static if (typeof(mixin("type." ~ m ~ "." ~ n)).stringof != "void") {
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_eq\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_eq(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_eq\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_eq(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_eq\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m)  ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n)~ "_neq\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_neq(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m)  ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n)~ "_neq\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_neq(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_neq\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_mt\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mt(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_mt\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mt(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mt\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_lt\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lt(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_lt\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lt(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lt\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_mte\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mte(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_mte\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_mte(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_mte\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_lte\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lte(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_lte\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_lte(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_lte\"]));\n";
 							
-							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_like\" in http_request.form)\n";
-							ret ~= "        query." ~ m ~ "_" ~ n ~ "_like(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\"]));\n";
+							ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m ~ "_" ~ n)), n) ~ "_like\" in currentTransport.request.form)\n";
+							ret ~= "        query." ~ m ~ "_" ~ n ~ "_like(to!" ~ typeof(mixin("type." ~ m ~ "_" ~ n)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_" ~ getNameValue!(typeof(mixin("type." ~ m)), n) ~ "_like\"]));\n";
 						}
 						
 					}
@@ -142,47 +143,47 @@ private {
 		} else static if (is(typeof(__traits(getMember, type, m)) == string) ||
 		                  is(typeof(__traits(getMember, type, m)) == dstring) ||
 		                  is(typeof(__traits(getMember, type, m)) == wstring)) {
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_eq\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_eq(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_eq\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_eq\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_eq(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_eq\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_neq\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_neq(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_neq\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_neq\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_neq(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_neq\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mt\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_mt(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mt\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mt\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_mt(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mt\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lt\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_lt(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lt\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lt\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_lt(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lt\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mte\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_mte(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mte\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mte\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_mte(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mte\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lte\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_lte(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lte\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lte\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_lte(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lte\"]);\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_like\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_like(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_like\"]);\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_like\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_like(cast(" ~ typeof(mixin("type." ~ m)).stringof ~ ")currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_like\"]);\n";
 		} else static if (typeof(__traits(getMember, type, m)).stringof != "void") {
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_eq\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_eq(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_eq\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_eq\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_eq(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_eq\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_neq\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_neq(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_neq\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_neq\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_neq(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_neq\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mt\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_mt(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mt\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mt\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_mt(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mt\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lt\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_lt(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lt\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lt\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_lt(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lt\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mte\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_mte(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mte\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_mte\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_mte(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_mte\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lte\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_lte(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lte\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_lte\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_lte(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_lte\"]));\n";
 			
-			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_like\" in http_request.form)\n";
-			ret ~= "        query." ~ m ~ "_like(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(http_request.form[\"" ~ getNameValue!(TYPE, m) ~ "_like\"]));\n";
+			ret ~= "    if (\"" ~ getNameValue!(TYPE, m) ~ "_like\" in currentTransport.request.form)\n";
+			ret ~= "        query." ~ m ~ "_like(to!" ~ typeof(mixin("type." ~ m)).stringof ~ "(currentTransport.request.form[\"" ~ getNameValue!(TYPE, m) ~ "_like\"]));\n";
 		}
 		
 		return ret;

@@ -1,12 +1,12 @@
 module cmsed.base.internal.models.session;
-import cmsed.base.internal.generators.js.model.defs;
+import cmsed.base.udas;
 import dvorm;
 
 /**
  * Dvorm based data model for usage with the session storage.
  */
 @dbName("Session")
-@shouldNotGenerateJavascriptModel
+@ShouldNotGenerateJavascriptModel
 class SessionModel {
 	@dbId {
 		string key;
@@ -20,7 +20,7 @@ class SessionModel {
 	static SessionModel[] getSessionById(string id) {
 		return SessionModel.query()
 			.key_eq(id)
-				.find();
+			.find();
 	}
 	
 	static void removeBySessionid(string id) {

@@ -1,5 +1,5 @@
 module cmsed.base.internal.restful.remove;
-import cmsed.base.internal.restful.defs;
+import cmsed.base.restful;
 import dvorm;
 import std.traits : moduleName;
 
@@ -14,7 +14,7 @@ pure string removeRestfulData(TYPE)() {
 @RouteFunction(RouteType.Delete, \"/" ~ getTableName!TYPE ~ "/:key\")
 void handleRestfulData" ~ TYPE.stringof ~ "Delete() {
     import " ~ moduleName!TYPE ~ ";
-    auto value = " ~ TYPE.stringof ~ ".findOne(http_request.params[\"key\"]);
+    auto value = " ~ TYPE.stringof ~ ".findOne(currentTransport.request.params[\"key\"]);
     if (value !is null) {
         """;
 	static if (__traits(hasMember, TYPE, "canDelete") && typeof(&type.canView).stringof == "bool delegate()") {
@@ -24,7 +24,7 @@ void handleRestfulData" ~ TYPE.stringof ~ "Delete() {
 	}
 	ret ~= """
             value.remove();
-            http_response.writeBody(\"\");
+            currentTransport.response.writeVoidBody();
         }
     }
 }

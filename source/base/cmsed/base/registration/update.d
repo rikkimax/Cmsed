@@ -1,6 +1,6 @@
 module cmsed.base.registration.update;
 import cmsed.base.util;
-import cmsed.base.internal.config : hasConfigurationChanged;
+import cmsed.base.config : hasConfigurationChanged;
 import cmsed.base.internal.nodes;
 import cmsed.base.timezones : rebuildTimeZones;
 import vibe.core.core : exitEventLoop, runTask, sleep, setTaskEventCallback, TaskEvent;
@@ -61,11 +61,11 @@ void addUpdateTask() {
 		// also runs them when starting.
 		while(true) {
 			runUpdates();
-			sleep(dur!"minutes"(utc0SysTime().minute));
+			sleep(dur!"hours"(1));
 		}
 	});
 	runTask({
-		// runs all the updates then sleeps so it runs every hour.
+        // runs all the updates then sleeps so it runs every hour.
 		// also runs them when starting.
 		while(true) {
 			runFrequentUpdates();

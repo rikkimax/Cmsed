@@ -1,10 +1,8 @@
 module cmsed.base.models;
-import cmsed.base.registration.model;
+import cmsed.base.registration.autoregister;
 
 public import cmsed.base.models.systemsettings;
-public import cmsed.base.models.widgetusage;
 
 shared static this() {
-	registerModel!SystemSettingModel();
-	registerModel!WidgetUsageModel();
+	autoRegister!__MODULE__;
 }

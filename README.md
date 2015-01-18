@@ -1,11 +1,12 @@
-Cmsed
-=====
+## Cmsed
+Cmsed is a web service framework in D.
+It uses a wide ranging technologies to provide an excellent development experience. By utilising compile time heavily to improve runtime efficiency.
 
-A component library for Vibe that functions as a CMS.<br/>
-There is currently a **getting started guide** in the wiki [link](https://github.com/rikkimax/Cmsed/wiki/Tutorial-Getting-started) little incomplete at the moment. But will help a lot if you are new.
+### Build status
+__Cmsed:base__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/)<br/>
+__Cmsed:test__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/)
 
-Features:
----------
+## Features
 - Router based upon classes.
 - Caches (pulls all values from a database reguarly for a model), with thanks to update mechanism.
 - Support for Dvorm as ORM.
@@ -16,16 +17,8 @@ Features:
 - Logging of all routes, widgets, data models, access.
 - Can be executed in automatic reload mode. Utilising a command argument. For use in production environement where having it able to be reconfigured and rebooted on error is required.
 
-Build status:
--------------
-__Cmsed:base__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20base/)<br/>
-__Cmsed:test__ [![Build Status](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/badge/icon)](http://1.vps.cattermole.co.nz/jenkins/job/cmsed%20test/)
-
-Examples:
----------
-
-**Routes**
-
+## Examples
+### Class based routing
 ```D
 import cmsed.base;
 
@@ -69,12 +62,7 @@ class Test : OORoute {
 Forces errors and checks against e.g. string/integer/float/boolean arguments. Enables calling it via: http://example.com/someargs?a=text1&b=text2<br/>
 You can further do validation from the arguments.
 
-**Javascript generation**
-
-Javascript is automatically generated to represent the data models and routes. This enables you to not need to write any ajax code.<br/>
-Configuration of these features is in the apropriete defs files under [cmsed/base/internal/generators/js](https://github.com/rikkimax/Cmsed/tree/master/source/base/cmsed/base/internal/generators/js)
-
-**Models**
+### Models
 
 Data models are pretty much as described by [Dvorm](https://github.com/rikkimax/Dvorm).
 
@@ -90,3 +78,27 @@ Don't worry about the logMe method on these models! Thats handled and called aut
 
 Note shared is a _required_ part of this. Without it you'll get 8+ registrations of said model (one for each thread).
 Same goes for routing. But here it's more important as it is executed and grabbed for values e.g. widgets (route and position/name being requested).
+
+## Dependencies
+* [https://github.com/rejectedsoftware/vibe.d](Vibe.d) is the heart and soul of Cmsed, it provides IO and threading support.
+* [https://github.com/rikkimax/dvorm](Dvorm) is the primary ORM used with Cmsed.
+
+**Optional:**
+* [https://github.com/rikkimax/dakka](Dakka) is an Actor framework that supports communication between seperate processes over socket. Provides Cmsed's ability to reload fast.
+* [https://github.com/rikkimax/skeleton](Skeleton) creates skeleton directories and files using descriptions from online. Also useful for its support of lua with github and bitbucket.
+* [https://github.com/JakobOvrum/LuaD](LuaD) enables usage of lua inside templates.
+
+## Structure of the library
+**Most important parts:**
+* source/base Majority of code here
+* source/minifier Minifies javascript/css
+* source/runners Executes the server
+* source/lua Provides Lua 5.1 support in templates
+* source/test For testing only
+
+**Extra useful code:**<br/>
+This code is generally compiled into Cmsed. However it is generated manually and committed into git.
+
+* util_code/browser_detection Provides browser capabilities based upon user agents
+* util_code/mime Mime types to file extensions
+* util_code/timezone Timezone name to UTC offset
