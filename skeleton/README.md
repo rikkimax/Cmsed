@@ -8,7 +8,7 @@ If you haven't already run:
 > Tip! You may want to do this in an empty directory
 
 ```bash
-$ dub run skeleton cmsed@rikkimax#cmsed_livereload/skeleton
+$ dub run skeleton -- cmsed@rikkimax#cmsed_livereload/skeleton
 ```
 
 Now into the created directory structure run:
@@ -16,7 +16,7 @@ Now into the created directory structure run:
 $ dub run livereload
 ```
 And you're done!
-This will start up livereload given the configuration in ``deps/dub.json``.
+This will start up livereload given the configuration in ``dub.json``.
 You can add your dependencies here.
 
 Now its configured to work in two different ways.
