@@ -1,0 +1,25 @@
+# Simple skeleton descriptor
+
+dlfile livereload.txt livereload.txt
+
+mkdir bin
+mkdir deps
+mkdir deps/imports
+dlfile deps/dub.json dub.json
+dlfile README.md README.md
+
+mkdir deps/imports/dynamic
+mkdir dynamic/config
+mkdir dynamic/models
+mkdir dynamic/public
+mkdir dynamic/routes
+mkdir dynamic/templates
+mkdir dynamic/caches
+
+mkdir deps/imports/static
+mkdir static/config
+mkdir static/models
+mkdir static/public
+mkdir static/routes
+mkdir static/templates
+mkdir static/caches

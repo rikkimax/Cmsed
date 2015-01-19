@@ -1,0 +1,29 @@
+# live reload config
+
+dub_dependency_dir: deps
+
+code_unit: dynamic/routes/*.d
+code_unit: static
+output_dir: bin
+
+dir_dependencies:
+	dynamic/routes/*.d
+		dynamic/caches/*.d
+		dynamic/templates/*
+		dynamic/models/*.d
+		dynamic/config/*
+		static/caches/*.d
+		static/templates/*
+		static/models/*.d
+		static/config/*
+
+grab_dependency_from_output:
+	# is a regex
+	template = dynamic/templates/*
+	datamodel = dynamic/models/*.d
+	template = static/templates/*
+	datamodel = static/models/*.d
+
+# is a regex
+dir_with_version: LiveReloadDynamicLoad dynamic/*
+dir_with_version: LiveReloadStaticLoad static/*
