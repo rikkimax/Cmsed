@@ -57,36 +57,49 @@ struct Render {
         }
 
         void prerenderFile(string name, string[] searchPaths...) {
+			import cmsed.base.util : utc0Time;
+			import cmsed.base.caches;
             import std.file : timeLastModified, readText, exists;
             import std.path : buildPath;
-            ulong time;
-            string filename = name;
 
-            if (!exists(name)) {
-                foreach(path; searchPaths) {
-                    string apath = buildPath(path, name);
-                    if (exists(apath))
-                        filename = apath;
-                }
-            }
+			auto templat = getPageTemplateByName(name);
+			if (templat !is null && templat.value !is null) {
+				fileChangedLast.storage()[name] = utc0Time();
+				prerender(name, templat.value);
+			} else {
+				string filename = name;
+				ulong time;
 
-            if (name in files.storage()) {
-                if (filename in fileChangedLast.storage()) {
-                    time = timeLastModified(filename).toUnixTime();
-                    ulong whenChanged = fileChangedLast.storage()[filename];
+				if (!exists(name)) {
+	                foreach(path; searchPaths) {
+	                    string apath = buildPath(path, name);
+	                    if (exists(apath))
+	                        filename = apath;
+	                }
+	            }
 
-                    if (whenChanged == time) {
-                        return;
-                    }
+	            if (name in files.storage()) {
+	                if (filename in fileChangedLast.storage()) {
+	                    time = timeLastModified(filename).toUnixTime();
+	                    ulong whenChanged = fileChangedLast.storage()[filename];
 
-                } else {
-                    return;
-                }
-            }
+	                    if (whenChanged == time) {
+	                        return;
+	                    }
 
-            fileChangedLast.storage()[filename] = time;
-            prerender(name, readText(filename));
-        }
+	                } else {
+	                    return;
+	                }
+	            }
+
+				if (exists(filename)) {
+	            	fileChangedLast.storage()[filename] = time;
+	            	prerender(name, readText(filename));
+				} else {
+					assert(0, "Unknown template"); //TODO: something better?
+				}
+			}
+		}
 
         private {
             void prerender(string filename, string text) {
