@@ -35,6 +35,16 @@ version(Have_cmsed_minifier) {
     }
 }
 
+version(Have_cssexpand) {
+	void cssExpanderDenest(string mime, ref string value) {
+		import cmsed.base.util : replace;
+		import cssexpand : CssMacroExpander;
+		static CssmacroExpander cme = new CssMacroExpander();
+
+		value = cme.expandAndDenest(value.replace("$", "¤").replace("__DOLLAR__", "$"));
+	}
+}
+
 void templatedFiles(string ext, ref string filename, ref string filesPath) {
     import cmsed.base.templates;
     import vibe.d : Path;

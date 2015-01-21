@@ -47,10 +47,16 @@ shared static this() {
         assignDStringHandler!(minifyHtmlJS)(getTemplateForType("javascript"));
         assignWStringHandler!(minifyHtmlJS)(getTemplateForType("javascript"));
         
-        assignStringHandler!(minifyHtmlJS)(getTemplateForType("css"));
+		version(Have_cssexpand) {
+			assignStringHandler!(cssExpanderDenest, minifyHtmlJS)(getTemplateForType("css"));
+		}
         assignDStringHandler!(minifyHtmlJS)(getTemplateForType("css"));
         assignWStringHandler!(minifyHtmlJS)(getTemplateForType("css"));
-    }
+	} else {
+		version(Have_cssexpand) {
+			assignStringHandler!(cssExpanderDenest, defaults)(getTemplateForType("css"));
+		}
+	}
 
     assignFileHandler!templatedFiles("tpl");
 }
