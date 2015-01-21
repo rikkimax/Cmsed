@@ -16,7 +16,12 @@ void delegate() getFuncOfRoute(alias SYMBL)() {
         static if (is(ReturnType!SYMBL : Json)) {
             pipelineHandle(mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")"));
         } else static if (is(ReturnType!SYMBL : IRouterReturnable) || is(ReturnType!SYMBL == RouterReturnable) || (__traits(compiles, { mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn(); }))) {
-            mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn();
+			static if (__traits(compiles, { bool v = mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn() !is null; })) {
+				if (mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn !is null)
+					mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn();
+			} else {
+            	mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")").handleReturn();
+			}
         } else static if (isSomeString!(ReturnType!SYMBL)) {
             pipelineHandle(getTemplateForType("html"), mixin("SYMBL(" ~ paramsGot!SYMBL ~ ")"));
         } else {

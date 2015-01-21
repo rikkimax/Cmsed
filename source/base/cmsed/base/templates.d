@@ -101,6 +101,8 @@ struct Render {
 			}
 		}
 
+		Render failed() { return Render.init; }
+
         private {
             void prerender(string filename, string text) {
                 files.storage()[filename] = ParsedTemplate.parse(text);
