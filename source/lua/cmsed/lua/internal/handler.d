@@ -32,9 +32,8 @@ function echo(...)
     echo_(out)
 end
 """);
-    }
 
-    luaState.doString("""
+    	luaState.doString("""
 -- http://lua-users.org/wiki/SimpleStack
 
 -- Stack Table
@@ -104,7 +103,7 @@ end
 -- CHILLCODE™
 """);
 
-    luaState.doString("""
+    	luaState.doString("""
 I_P_INCLUDE_P_I = Stack:Create()
 I_P_INCLUDE_TEXT_P_I = Stack:Create()
 
@@ -164,6 +163,7 @@ function consumeNextText()
     return value
 end
 """);
+	}
 
     return luaState;
 }
