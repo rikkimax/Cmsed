@@ -160,8 +160,8 @@ class CTFEURLRouter : HTTPServerRequestHandler {
                         currentRoute = cast(RouteInformation)k;
                         v.route();
                         
-                        if (res.headerWritten) {
-                            // we succedded in the request
+                        if (res.headerWritten || res.statusCode != HTTPStatus.ok) {
+                            // we succedded in the request (or failed miserably)
                             // now its time to stop
                             return;
                         } else {
@@ -175,7 +175,7 @@ class CTFEURLRouter : HTTPServerRequestHandler {
             }
 
             tryRoutes(routes);
-            if (!res.headerWritten)
+			if (res.statusCode == HTTPStatus.ok && !res.headerWritten)
                 tryRoutes(secondaryRouters);
 
             if (res.headerWritten)
