@@ -2,9 +2,10 @@
 import cmsed.base.util;
 import cmsed.base.routing.defs;
 import cmsed.base.mimetypes;
+import cmsed.base.pipelining;
 import vibe.d : Json;
 
-private __gshared {
+package __gshared {
     void function(string, ref Json) jsonPipeLine;
 
     void function(string, ref string, ref string)[string] filePipeLine;
@@ -199,44 +200,5 @@ package {
         appendToFile(path, "wstring handlers " ~ to!string(wstringPipeLine.keys));
         appendToFile(path, "dstring handlers " ~ to!string(dstringPipeLine.keys));
         appendToFile(path, "any handlers " ~ to!string(anyPipeLine.keys));
-    }
-}
-
-private {
-    void defaults(string mime, ref Json value) {
-        currentTransport.response.writeBody(cast(ubyte[])value.toString(), mime);
-    }
-
-    void defaults_file(string ext, ref string value, ref string extra) {
-        import cmsed.base.mimetypes : getNameFromExtension;
-        import std.file : read;
-
-        string mime = getNameFromExtension(ext);
-        auto data = read(value);
-
-        if (mime in stringPipeLine)
-            pipelineHandle(mime, cast(string)data);
-        else if (mime in dstringPipeLine)
-            pipelineHandle(mime, cast(dstring)data);
-        else if (mime in wstringPipeLine)
-            pipelineHandle(mime, cast(wstring)data);
-        else
-            pipelineHandle(mime, cast(ubyte[])data);
-    }
-
-    void defaults(string mime, ref string value) {
-        currentTransport.response.writeBody(cast(ubyte[])value, mime);
-    }
-
-    void defaults(string mime, ref wstring value) {
-        currentTransport.response.writeBody(cast(ubyte[])value, mime);
-    }
-
-    void defaults(string mime, ref dstring value) {
-        currentTransport.response.writeBody(cast(ubyte[])value, mime);
-    }
-
-    void defaults(string mime, ref ubyte[] value) {
-        currentTransport.response.writeBody(value, mime);
     }
 }

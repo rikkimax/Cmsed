@@ -44,3 +44,41 @@ void templatedFiles(string ext, ref string filename, ref string filesPath) {
     Render render = Render([ppPath, filesPath], filename);
     render.handleReturn();
 }
+
+void defaults(string mime, ref Json value) {
+	currentTransport.response.writeBody(cast(ubyte[])value.toString(), mime);
+}
+
+void defaults_file(string ext, ref string value, ref string extra) {
+	import cmsed.base.registration.pipeline;
+	import cmsed.base.mimetypes : getNameFromExtension;
+	import std.file : read;
+	
+	string mime = getNameFromExtension(ext);
+	auto data = read(value);
+	
+	if (mime in stringPipeLine)
+		pipelineHandle(mime, cast(string)data);
+	else if (mime in dstringPipeLine)
+		pipelineHandle(mime, cast(dstring)data);
+	else if (mime in wstringPipeLine)
+		pipelineHandle(mime, cast(wstring)data);
+	else
+		pipelineHandle(mime, cast(ubyte[])data);
+}
+
+void defaults(string mime, ref string value) {
+	currentTransport.response.writeBody(cast(ubyte[])value, mime);
+}
+
+void defaults(string mime, ref wstring value) {
+	currentTransport.response.writeBody(cast(ubyte[])value, mime);
+}
+
+void defaults(string mime, ref dstring value) {
+	currentTransport.response.writeBody(cast(ubyte[])value, mime);
+}
+
+void defaults(string mime, ref ubyte[] value) {
+	currentTransport.response.writeBody(value, mime);
+}
