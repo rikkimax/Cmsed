@@ -69,3 +69,4 @@ struct RouteErrorHandler {
     int error;
 }
 
+struct RouteOnInstall {}

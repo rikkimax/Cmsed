@@ -14,6 +14,18 @@ pure bool isARouteFunction(alias SYMBL)() {
     return false;
 }
 
+pure bool isARouteOnInstallFunction(alias SYMBL)() {
+	static if (is(typeof(SYMBL) == function) || is(typeof(SYMBL) == delegate)) {
+		foreach(UDA; __traits(getAttributes, SYMBL)) {
+			static if (__traits(compiles, {RouteOnInstall rf = UDA; } )) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
 pure RouteType getRouteTypeFromFunction(alias SYMBL)() {
     foreach(UDA; __traits(getAttributes, SYMBL)) {
         static if (__traits(compiles, {RouteFunction rf = UDA; } )) {

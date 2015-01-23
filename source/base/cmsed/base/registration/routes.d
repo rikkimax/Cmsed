@@ -40,8 +40,11 @@ void registerRoute(C)() if (isARouteClass!C) {
  */
 void registerRoute(alias SYMBL, string file)() if (isARouteFunction!SYMBL) {
     synchronized {
-        configureRouteFuncs ~= &registerRouteHandler!(SYMBL, file);
-        
+		static if (isARouteOnInstallFunction!SYMBL)
+			configureInstallRouteFuncs ~= &registerRouteHandler!(SYMBL, file);
+		else
+			configureRouteFuncs ~= &registerRouteHandler!(SYMBL, file);
+
         //TODO: generateJavascriptRoute!SYMBL;
     }
 }
